@@ -1,0 +1,150 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// === ENUMLAR (Ozgarmas qiymatlar ro'yxati) ===
+
+enum Role {
+  ADMIN
+  TUTOR
+  STUDENT
+}
+
+enum Category {
+  PROGRAMMING
+  DESIGN
+  BUSINESS
+  MARKETING
+  ECOLOGY
+  EDUCATION
+  MEDICINE
+  OTHER
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+// === JADVALLAR (MODELS) ===
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique // Faqat @adu.uz uchun logic controller'da yoziladi
+  
+  // Autentifikatsiya (OTP va Admin 2FA uchun)
+  otpCode        String?
+  otpExpiresAt   DateTime?
+  adminAuthCode  String?   // 20 xonali admin kodi uchun
+  adminCodeExp   DateTime? // 20 soniyalik muddat uchun
+  
+  role           Role      @default(STUDENT)
+  
+  // Telegram ma'lumotlari
+  telegramId     String?   @unique // Admin panel / bildirishnomalar uchun
+  tgUsername     String?   // Ochiq ko'rinmaydi, bazada saqlanadi
+  
+  // Limitlar va bog'lanishlar
+  aiLimit        Int       @default(10) // AI ishlatish limiti
+  
+  // Tyutor va Talaba o'rtasidagi munosabat (Zirhli eshik logikasi)
+  invitedById    String?
+  invitedBy      User?     @relation("TutorInvites", fields: [invitedById], references: [id])
+  invitedUsers   User[]    @relation("TutorInvites")
+  
+  // Foydalanuvchiga tegishli kontentlar
+  projects       Project[]
+  resumes        Resume[]
+  problems       Problem[]
+  requests       Request[] // Yuborgan arizalari
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// Zirhli eshik uchun vaqtinchalik taklif kodlari jadvalli
+model InviteCode {
+  id        String   @id @default(uuid())
+  code      String   @unique // 6 xonali kod
+  tutorId   String   // Qaysi Tyutor yaratgani
+  expiresAt DateTime // 10 daqiqada kuyib qolish vaqti
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id          String    @id @default(uuid())
+  title       String
+  description String    @db.Text
+  category    Category
+  
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  requests    Request[] // Bu startapga tushgan arizalar
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Resume {
+  id          String    @id @default(uuid())
+  title       String    // Masalan: "Full-Stack Dasturchi"
+  skills      String[]  // ["Node.js", "React", "PostgreSQL"] kabi
+  category    Category
+  
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Agar startapchilar bu rezyumega ish taklif qilsa
+  requests    Request[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Problem {
+  id          String    @id @default(uuid())
+  title       String
+  description String    @db.Text
+  
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime  @default(now())
+}
+
+model Request {
+  id          String        @id @default(uuid())
+  status      RequestStatus @default(PENDING)
+  
+  // Ariza yuboruvchi
+  senderId    String
+  sender      User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  
+  // Qaysi loyihaga yoki rezyumega tegishli ekanligi (Biri null, biri to'la bo'ladi)
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  resumeId    String?
+  resume      Resume?       @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+// Tizim holatini boshqarish (Faqat 1 ta qator bo'ladi: Tizim ochiqmi/yopiqmi)
+model SystemSettings {
+  id             Int      @id @default(1)
+  isSystemOpen   Boolean  @default(false) // Zirhli eshikni yopish/ochish
+  defaultAiLimit Int      @default(10)
+  updatedAt      DateTime @updatedAt
+}
