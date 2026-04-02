@@ -2,9 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-// Yo'nalishlarni (Routes) chaqirib olamiz
 const authRoutes = require('./src/routes/authRoutes');
-const projectRoutes = require('./src/routes/projectRoutes'); // Yangi ulangan joy
+const projectRoutes = require('./src/routes/projectRoutes');
+const resumeRoutes = require('./src/routes/resumeRoutes');   // Yangi
+const requestRoutes = require('./src/routes/requestRoutes'); // Yangi
 
 const app = express();
 
@@ -13,12 +14,14 @@ app.use(express.json());
 
 // === MARSHRUTLAR (API ROUTES) ===
 app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes); // Loyihalar uchun marshrut
+app.use('/api/projects', projectRoutes);
+app.use('/api/resumes', resumeRoutes);
+app.use('/api/requests', requestRoutes);
 
 app.get('/', (req, res) => {
   res.status(200).json({ 
     status: "success",
-    message: "ADU Startup Hub API muvaffaqiyatli ishlamoqda!",
+    message: "ADU Startup Hub API to'liq quvvatda ishlamoqda!",
     version: "1.0.0"
   });
 });
