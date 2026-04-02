@@ -1,18 +1,20 @@
-require('dotenv').config(); // Local testing uchun, Railway'da o'zi Variables'dan o'qiydi
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+
+// Yo'nalishlarni (Routes) chaqirib olamiz
 const authRoutes = require('./src/routes/authRoutes');
+const projectRoutes = require('./src/routes/projectRoutes'); // Yangi ulangan joy
 
 const app = express();
 
-// Xavfsizlik va sozlamalar
-app.use(cors()); // Boshqa domenlardan keladigan so'rovlarga ruxsat berish
-app.use(express.json()); // Kelayotgan ma'lumotlarni JSON formatida o'qish uchun
+app.use(cors());
+app.use(express.json());
 
 // === MARSHRUTLAR (API ROUTES) ===
 app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes); // Loyihalar uchun marshrut
 
-// Server ishlashini tekshirish uchun ochiq eshik
 app.get('/', (req, res) => {
   res.status(200).json({ 
     status: "success",
@@ -21,12 +23,10 @@ app.get('/', (req, res) => {
   });
 });
 
-// Noto'g'ri manzilga kirilsa, qaytariladigan javob
 app.use('*', (req, res) => {
   res.status(404).json({ error: "Bunday manzil tizimda mavjud emas." });
 });
 
-// Serverni belgilangan portda yoqish
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`[Server] Ishga tushdi: Port ${PORT}`);
