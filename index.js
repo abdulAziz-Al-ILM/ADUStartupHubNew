@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
@@ -8,13 +9,18 @@ const projectRoutes = require('./src/routes/projectRoutes');
 const problemRoutes = require('./src/routes/problemRoutes');
 const resumeRoutes = require('./src/routes/resumeRoutes');   
 const requestRoutes = require('./src/routes/requestRoutes'); 
-const socialRoutes = require('./src/routes/socialRoutes');       // Yangi
-const dashboardRoutes = require('./src/routes/dashboardRoutes'); // Yangi
+const socialRoutes = require('./src/routes/socialRoutes');       
+const dashboardRoutes = require('./src/routes/dashboardRoutes'); 
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// === FRONTEND SOZLAMALARI (EJS va Public papka) ===
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'src/views'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // === MARSHRUTLAR (API ROUTES) ===
 app.use('/api/auth', authRoutes);
@@ -23,19 +29,20 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/problems', problemRoutes); 
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/requests', requestRoutes);
-app.use('/api/social', socialRoutes);       // Mutaxassislar va xabarlar
-app.use('/api/dashboard', dashboardRoutes); // Hisobot
+app.use('/api/social', socialRoutes);       
+app.use('/api/dashboard', dashboardRoutes); 
 
+// === SAYT SAHIFALARI (FRONTEND) ===
 app.get('/', (req, res) => {
-  res.status(200).json({ 
-    status: "success",
-    message: "ADU Startup Hub API to'liq quvvatda ishlamoqda!",
-    version: "1.0.0"
-  });
+  res.render('pages/login'); // Asosiy sahifa - Kirish (Login)
+});
+
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: "Bunday API manzil mavjud emas." });
 });
 
 app.use('*', (req, res) => {
-  res.status(404).json({ error: "Bunday manzil tizimda mavjud emas." });
+  res.redirect('/'); // Boshqa noma'lum manzillar Loginga qaytaradi
 });
 
 const PORT = process.env.PORT || 3000;
