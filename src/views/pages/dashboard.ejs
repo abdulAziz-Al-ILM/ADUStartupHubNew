@@ -38,7 +38,9 @@
         <div>
             <div class="h-20 flex items-center gap-3 px-6 border-b border-darkBorder bg-darkBg/50 backdrop-blur-md">
                 <svg class="w-8 h-8 text-blue-500 drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
                 </svg>
                 <span class="font-bold text-lg tracking-tight">Startup Hub</span>
             </div>
@@ -168,14 +170,13 @@
             window.location.href = '/login';
         }
 
-        // Tablarni silliq almashtirish (Smooth transition)
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('opacity-100', 'translate-y-0');
                 tab.classList.add('opacity-0', 'translate-y-4');
                 setTimeout(() => {
                     tab.classList.add('hidden');
-                }, 300); // 300ms kutib keyin display:none qiladi
+                }, 300);
             });
 
             document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -185,7 +186,6 @@
             setTimeout(() => {
                 const activeTab = document.getElementById(tabId);
                 activeTab.classList.remove('hidden');
-                // Brauzer render qilishi uchun ozgina kutib keyin opacity ni yoqamiz
                 setTimeout(() => {
                     activeTab.classList.remove('opacity-0', 'translate-y-4');
                     activeTab.classList.add('opacity-100', 'translate-y-0');
