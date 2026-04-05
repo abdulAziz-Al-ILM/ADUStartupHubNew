@@ -34,11 +34,16 @@ app.use('/api/dashboard', dashboardRoutes);
 
 // === SAYT SAHIFALARI (FRONTEND) ===
 app.get('/', (req, res) => {
-  res.render('pages/landing'); // Yangi Asosiy Sahifa
+  res.render('pages/landing'); 
 });
 
 app.get('/login', (req, res) => {
-  res.render('pages/login'); // Kirish oynasi alohida manzilga ko'chdi
+  res.render('pages/login'); 
+});
+
+// YANGI: Ichki panel (Ilova ichi)
+app.get('/dashboard', (req, res) => {
+  res.render('pages/dashboard'); 
 });
 
 app.use('/api/*', (req, res) => {
