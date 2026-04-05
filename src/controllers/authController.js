@@ -14,17 +14,14 @@ exports.requestOtp = async (req, res) => {
 
     const system = await prisma.systemSettings.findFirst();
     const userExists = await prisma.user.findUnique({ where: { email } });
+    const isDevMode = process.env.DEV_MODE === 'true';
 
-    // Admin DevMode'da ekanligini aniqlash
-    const isAdminDev = (email === 'admin@adu.uz' && process.env.DEV_MODE === 'true');
-
-    // Agar tizim yopiq bo'lsa, foydalanuvchi yangi bo'lsa VA u admin bo'lmasa -> BLOKLASH
-    if (!system?.isSystemOpen && !userExists && !isAdminDev) {
+    // Agar tizim yopiq bo'lsa, foydalanuvchi yangi bo'lsa VA biz DevMode da bo'lmasak -> BLOKLASH
+    if (!system?.isSystemOpen && !userExists && !isDevMode) {
       return res.status(403).json({ error: "Tizim hozircha yopiq. Yangi a'zolar faqat Tyutor taklif kodi orqali kira oladi." });
     }
 
-    // Spamdan himoya
-    if (userExists && userExists.otpExpiresAt) {
+    if (userExists && userExists.otpExpiresAt && !isDevMode) {
       const timeDiff = (new Date(userExists.otpExpiresAt) - new Date()) / 1000;
       if (timeDiff > 180) { 
         return res.status(429).json({ error: "Kodni qayta so'rash uchun biroz kuting." });
@@ -32,17 +29,24 @@ exports.requestOtp = async (req, res) => {
     }
 
     let otpCode;
+    let assignRole = 'STUDENT'; // Asosiy rol
 
-    if (isAdminDev) {
-      otpCode = '0000'; // Admin eshigi
+    // DEV_MODE da rollarni pochta nomidan avtomatik aniqlaymiz (TEST UCHUN)
+    if (isDevMode) {
+      otpCode = '0000';
+      if (email === 'admin@adu.uz') assignRole = 'ADMIN';
+      else if (email.startsWith('leader')) assignRole = 'LEADER';
+      else if (email.startsWith('tutor')) assignRole = 'TUTOR';
     } else {
       otpCode = generateOTP();
       const isSent = await sendOTP(email, otpCode);
       if (!isSent) return res.status(500).json({ error: "Kodni yuborishda xatolik." });
+      if (email === 'admin@adu.uz') assignRole = 'ADMIN'; 
     }
 
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
+    // Bazaga qo'shish yoki yangilash
     await prisma.user.upsert({
       where: { email },
       update: { otpCode, otpExpiresAt: expiresAt },
@@ -50,7 +54,7 @@ exports.requestOtp = async (req, res) => {
         email, 
         otpCode, 
         otpExpiresAt: expiresAt,
-        role: email === 'admin@adu.uz' ? 'ADMIN' : 'STUDENT'
+        role: assignRole
       }
     });
 
@@ -63,25 +67,24 @@ exports.requestOtp = async (req, res) => {
 exports.loginWithInviteCode = async (req, res) => {
   try {
     const { email, inviteCode } = req.body;
-
     if (!email.endsWith('@adu.uz')) return res.status(403).json({ error: "Faqat @adu.uz pochtasi." });
 
     const validCode = await prisma.inviteCode.findUnique({ where: { code: inviteCode } });
 
     if (!validCode) return res.status(404).json({ error: "Taklif kodi topilmadi." });
     if (validCode.isUsed) return res.status(400).json({ error: "Bu koddan allaqachon foydalanilgan." });
-    if (new Date() > validCode.expiresAt) return res.status(400).json({ error: "Kodning 10 daqiqalik muddati tugagan." });
+    if (new Date() > validCode.expiresAt) return res.status(400).json({ error: "Kod muddati tugagan." });
 
     await prisma.inviteCode.update({ where: { id: validCode.id }, data: { isUsed: true } });
 
     const user = await prisma.user.upsert({
       where: { email },
       update: { invitedById: validCode.tutorId },
-      create: { email, invitedById: validCode.tutorId }
+      create: { email, invitedById: validCode.tutorId, role: 'STUDENT' }
     });
 
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.status(200).json({ message: "Tizimga muvaffaqiyatli kirdingiz!", token });
+    res.status(200).json({ message: "Tizimga kirdingiz!", token });
   } catch (error) {
     res.status(500).json({ error: "Xatolik yuz berdi." });
   }
