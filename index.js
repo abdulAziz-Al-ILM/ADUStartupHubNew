@@ -17,7 +17,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// === FRONTEND SOZLAMALARI (EJS va Public papka) ===
+// === FRONTEND SOZLAMALARI (EJS) ===
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -34,7 +34,11 @@ app.use('/api/dashboard', dashboardRoutes);
 
 // === SAYT SAHIFALARI (FRONTEND) ===
 app.get('/', (req, res) => {
-  res.render('pages/login'); // Asosiy sahifa - Kirish (Login)
+  res.render('pages/landing'); // Yangi Asosiy Sahifa
+});
+
+app.get('/login', (req, res) => {
+  res.render('pages/login'); // Kirish oynasi alohida manzilga ko'chdi
 });
 
 app.use('/api/*', (req, res) => {
@@ -42,10 +46,10 @@ app.use('/api/*', (req, res) => {
 });
 
 app.use('*', (req, res) => {
-  res.redirect('/'); // Boshqa noma'lum manzillar Loginga qaytaradi
+  res.redirect('/'); 
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`[Server] Ishga tushdi: Port ${PORT}`);
 });
