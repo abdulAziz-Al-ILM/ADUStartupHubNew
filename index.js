@@ -5,9 +5,11 @@ const cors = require('cors');
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const projectRoutes = require('./src/routes/projectRoutes');
-const problemRoutes = require('./src/routes/problemRoutes'); // Yangi ulangan joy
+const problemRoutes = require('./src/routes/problemRoutes');
 const resumeRoutes = require('./src/routes/resumeRoutes');   
 const requestRoutes = require('./src/routes/requestRoutes'); 
+const socialRoutes = require('./src/routes/socialRoutes');       // Yangi
+const dashboardRoutes = require('./src/routes/dashboardRoutes'); // Yangi
 
 const app = express();
 
@@ -18,9 +20,11 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
-app.use('/api/problems', problemRoutes); // Muammolar bazasi
+app.use('/api/problems', problemRoutes); 
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/requests', requestRoutes);
+app.use('/api/social', socialRoutes);       // Mutaxassislar va xabarlar
+app.use('/api/dashboard', dashboardRoutes); // Hisobot
 
 app.get('/', (req, res) => {
   res.status(200).json({ 
