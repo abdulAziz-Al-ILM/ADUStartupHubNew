@@ -3,8 +3,9 @@ const express = require('express');
 const cors = require('cors');
 
 const authRoutes = require('./src/routes/authRoutes');
-const userRoutes = require('./src/routes/userRoutes');       // Yangi qo'shildi
+const userRoutes = require('./src/routes/userRoutes');
 const projectRoutes = require('./src/routes/projectRoutes');
+const problemRoutes = require('./src/routes/problemRoutes'); // Yangi ulangan joy
 const resumeRoutes = require('./src/routes/resumeRoutes');   
 const requestRoutes = require('./src/routes/requestRoutes'); 
 
@@ -15,8 +16,9 @@ app.use(express.json());
 
 // === MARSHRUTLAR (API ROUTES) ===
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);         // Profil uchun yo'nalish
+app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/problems', problemRoutes); // Muammolar bazasi
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/requests', requestRoutes);
 
