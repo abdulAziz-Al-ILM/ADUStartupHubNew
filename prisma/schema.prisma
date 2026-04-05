@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,23 +7,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// === ENUMLAR (Ozgarmas qiymatlar ro'yxati) ===
+// === ENUMLAR (O'zgarmas qiymatlar) ===
 
 enum Role {
   ADMIN
+  LEADER    
   TUTOR
   STUDENT
 }
 
-enum Category {
-  PROGRAMMING
-  DESIGN
-  BUSINESS
-  MARKETING
-  ECOLOGY
-  EDUCATION
-  MEDICINE
-  OTHER
+enum Profession {
+  IT_ENGINEER
+  UI_UX_DESIGNER
+  PROJECT_MANAGER
+  MARKETOLOG
+  ECONOMIST
+  BIOLOGIST
+  ECOLOGIST
+  PEDAGOGUE
+  DOCTOR
+  PHARMACIST
+  LINGUIST
+  JURIST
+  AGRONOMIST
+  CHEMIST
+  PHYSICIST
+}
+
+enum ProjectStatus {
+  TEAM_BUILDING       
+  MVP_PREPARATION     
+  MARKET_PREPARATION  
+  IN_MARKET           
+  REJECTED            
+  FINISHED            
 }
 
 enum RequestStatus {
@@ -37,100 +52,118 @@ enum RequestStatus {
 // === JADVALLAR (MODELS) ===
 
 model User {
-  id             String    @id @default(uuid())
-  email          String    @unique // Faqat @adu.uz uchun logic controller'da yoziladi
+  id               String      @id @default(uuid())
+  email            String      @unique
   
-  // Autentifikatsiya (OTP va Admin 2FA uchun)
-  otpCode        String?
-  otpExpiresAt   DateTime?
-  adminAuthCode  String?   // 20 xonali admin kodi uchun
-  adminCodeExp   DateTime? // 20 soniyalik muddat uchun
+  // Profil ma'lumotlari
+  nickname         String?     @unique
+  nicknameSetAt    DateTime?   
+  avatarSticker    Int         @default(1) 
+  profession       Profession?
+  aboutMe          String?     @db.Text
+  isEmailPublic    Boolean     @default(false)
   
-  role           Role      @default(STUDENT)
+  // Autentifikatsiya va Xavfsizlik
+  otpCode          String?
+  otpExpiresAt     DateTime?
+  role             Role        @default(STUDENT)
   
-  // Telegram ma'lumotlari
-  telegramId     String?   @unique // Admin panel / bildirishnomalar uchun
-  tgUsername     String?   // Ochiq ko'rinmaydi, bazada saqlanadi
+  // Telegram va Admin xavfsizligi
+  telegramId       String?     @unique
+  tgUsername       String?
+  adminPassword    String?     
+  adminAuthCode    String?
+  adminCodeExp     DateTime?
+  trustedDevices   String[]    
   
-  // Limitlar va bog'lanishlar
-  aiLimit        Int       @default(10) // AI ishlatish limiti
+  // Zirhli eshik
+  invitedById      String?
+  invitedBy        User?       @relation("TutorInvites", fields: [invitedById], references: [id])
+  invitedUsers     User[]      @relation("TutorInvites")
   
-  // Tyutor va Talaba o'rtasidagi munosabat (Zirhli eshik logikasi)
-  invitedById    String?
-  invitedBy      User?     @relation("TutorInvites", fields: [invitedById], references: [id])
-  invitedUsers   User[]    @relation("TutorInvites")
-  
-  // Foydalanuvchiga tegishli kontentlar
-  projects       Project[]
-  resumes        Resume[]
-  problems       Problem[]
-  requests       Request[] // Yuborgan arizalari
+  // Limitlar
+  canCreateProject Boolean     @default(true) 
+  dailyMsgCount    Int         @default(0)    
+  dailyIdeaCount   Int         @default(0)    
+  lastResetDate    DateTime    @default(now()) 
 
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  // Aloqalar
+  projects         Project[]
+  resumes          Resume[]
+  problems         Problem[]
+  requests         Request[]
+  following        Follow[]    @relation("Follower")
+  followers        Follow[]    @relation("Following")
+  sentMessages     Message[]   @relation("Sender")
+  receivedMessages Message[]   @relation("Receiver")
+
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 }
 
-// Zirhli eshik uchun vaqtinchalik taklif kodlari jadvalli
 model InviteCode {
   id        String   @id @default(uuid())
-  code      String   @unique // 6 xonali kod
-  tutorId   String   // Qaysi Tyutor yaratgani
-  expiresAt DateTime // 10 daqiqada kuyib qolish vaqti
+  code      String   @unique
+  tutorId   String
+  expiresAt DateTime
   isUsed    Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 
 model Project {
-  id          String    @id @default(uuid())
-  title       String
-  description String    @db.Text
-  category    Category
+  id            String        @id @default(uuid())
+  title         String
+  goal          String        @db.Text 
+  reason        String        @db.Text 
+  benefit       String        @db.Text 
   
-  authorId    String
-  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category      Profession    
+  status        ProjectStatus @default(TEAM_BUILDING)
+  cancelReason  String?       @db.Text 
   
-  requests    Request[] // Bu startapga tushgan arizalar
+  authorId      String
+  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  requests      Request[]
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model Resume {
-  id          String    @id @default(uuid())
-  title       String    // Masalan: "Full-Stack Dasturchi"
-  skills      String[]  // ["Node.js", "React", "PostgreSQL"] kabi
-  category    Category
-  
-  authorId    String
-  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  
-  // Agar startapchilar bu rezyumega ish taklif qilsa
-  requests    Request[]
-
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 model Problem {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
-  description String    @db.Text
+  description String   @db.Text
+  isDraft     Boolean  @default(false) 
+  aiFeedback  String?  @db.Text        
   
   authorId    String
-  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
+}
+
+model Resume {
+  id          String     @id @default(uuid())
+  title       String
+  skills      String[]
+  category    Profession
+  
+  authorId    String
+  author      User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  requests    Request[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 model Request {
   id          String        @id @default(uuid())
   status      RequestStatus @default(PENDING)
   
-  // Ariza yuboruvchi
   senderId    String
   sender      User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
   
-  // Qaysi loyihaga yoki rezyumega tegishli ekanligi (Biri null, biri to'la bo'ladi)
   projectId   String?
   project     Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   
@@ -141,10 +174,30 @@ model Request {
   updatedAt   DateTime      @updatedAt
 }
 
-// Tizim holatini boshqarish (Faqat 1 ta qator bo'ladi: Tizim ochiqmi/yopiqmi)
+// Ijtimoiy logikalar (Kuzatish va Xabarlar)
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String
+  followingId String
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  text        String   @db.Text 
+  senderId    String
+  receiverId  String
+  sender      User     @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
 model SystemSettings {
   id             Int      @id @default(1)
-  isSystemOpen   Boolean  @default(false) // Zirhli eshikni yopish/ochish
-  defaultAiLimit Int      @default(10)
+  isSystemOpen   Boolean  @default(false)
   updatedAt      DateTime @updatedAt
 }
