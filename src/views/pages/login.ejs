@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="uz" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADU Startup Hub - Kirish</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        lightBg: '#f1f5f9',
+                        lightCard: '#ffffff',
+                        lightTextMain: '#0f172a',
+                        lightTextSub: '#64748b',
+                        darkBg: '#0b1120',
+                        darkCard: '#151e32',
+                        darkBorder: '#1e293b',
+                        darkTextMain: '#e2e8f0',
+                        darkTextSub: '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Premium Grid va xira muhit foni */
+        .bg-grid-pattern {
+            background-image: radial-gradient(rgba(100, 116, 139, 0.2) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .dark .bg-grid-pattern {
+            background-image: radial-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-lightBg dark:bg-darkBg text-lightTextMain dark:text-darkTextMain transition-colors duration-300 min-h-screen flex items-center justify-center relative bg-grid-pattern font-sans antialiased overflow-hidden">
+    
+    <div class="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-500/10 dark:bg-blue-600/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <div class="relative w-full max-w-md p-8 bg-lightCard dark:bg-darkCard border border-transparent dark:border-darkBorder shadow-2xl rounded-2xl z-10 flex flex-col gap-6">
+        
+        <div class="text-center">
+            <div class="w-12 h-12 bg-lightTextMain dark:bg-darkTextMain text-lightCard dark:text-darkBg rounded-xl mx-auto flex items-center justify-center text-xl font-bold mb-4 shadow-md">
+                SH
+            </div>
+            <h1 class="text-2xl font-semibold tracking-tight">ADU Startup Hub</h1>
+            <p class="text-lightTextSub dark:text-darkTextSub text-sm mt-2">Yopiq korporativ ekotizimga kirish</p>
+        </div>
+
+        <div id="alertBox" class="hidden w-full p-3 rounded-lg text-sm font-medium border text-center transition-all"></div>
+
+        <div id="step1" class="flex flex-col gap-4">
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-lightTextSub dark:text-darkTextSub">Korporativ pochta (@adu.uz)</label>
+                <input type="email" id="emailInput" placeholder="talaba@adu.uz" class="w-full bg-lightBg dark:bg-darkBg border border-gray-200 dark:border-darkBorder rounded-lg px-4 py-2.5 outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-colors text-lightTextMain dark:text-darkTextMain placeholder:text-gray-400 dark:placeholder:text-gray-600">
+            </div>
+            <button onclick="requestOtp()" class="w-full bg-lightTextMain dark:bg-darkTextMain text-lightCard dark:text-darkBg font-medium rounded-lg py-2.5 hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
+                Davom etish
+            </button>
+            
+            <div class="relative flex py-2 items-center">
+                <div class="flex-grow border-t border-gray-200 dark:border-darkBorder"></div>
+                <span class="flex-shrink-0 mx-4 text-xs text-lightTextSub dark:text-darkTextSub">YOKI</span>
+                <div class="flex-grow border-t border-gray-200 dark:border-darkBorder"></div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-lightTextSub dark:text-darkTextSub">Tyutor taklif kodi (Ixtiyoriy)</label>
+                <input type="text" id="inviteCodeInput" placeholder="6 xonali kod" class="w-full bg-lightBg dark:bg-darkBg border border-gray-200 dark:border-darkBorder rounded-lg px-4 py-2.5 outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-colors text-lightTextMain dark:text-darkTextMain uppercase tracking-widest placeholder:normal-case placeholder:tracking-normal placeholder:text-gray-400 dark:placeholder:text-gray-600">
+            </div>
+            <button onclick="loginWithInvite()" class="w-full bg-transparent border border-gray-300 dark:border-darkBorder text-lightTextMain dark:text-darkTextMain font-medium rounded-lg py-2.5 hover:bg-gray-50 dark:hover:bg-darkBg transition-colors">
+                Kod orqali kirish
+            </button>
+        </div>
+
+        <div id="step2" class="hidden flex-col gap-4">
+            <div class="flex flex-col gap-1.5 text-center mb-2">
+                <label class="text-sm font-medium text-lightTextSub dark:text-darkTextSub">Pochtangizga yuborilgan 4 xonali kodni kiriting</label>
+                <input type="text" id="otpInput" maxlength="4" placeholder="0000" class="w-full text-center tracking-[1em] text-2xl bg-lightBg dark:bg-darkBg border border-gray-200 dark:border-darkBorder rounded-lg px-4 py-3 outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-colors text-lightTextMain dark:text-darkTextMain placeholder:text-gray-300 dark:placeholder:text-gray-700">
+            </div>
+            <button onclick="verifyOtp()" class="w-full bg-blue-600 text-white font-medium rounded-lg py-2.5 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30">
+                Tizimga kirish
+            </button>
+            <button onclick="location.reload()" class="text-sm text-lightTextSub dark:text-darkTextSub hover:text-lightTextMain dark:hover:text-darkTextMain transition-colors text-center mt-2">
+                Ortga qaytish
+            </button>
+        </div>
+
+    </div>
+
+    <div class="absolute bottom-6 right-6 flex gap-3">
+        <button onclick="document.documentElement.classList.toggle('dark')" class="w-10 h-10 rounded-full bg-lightCard dark:bg-darkCard border border-gray-200 dark:border-darkBorder shadow-lg flex items-center justify-center text-lightTextSub dark:text-darkTextSub hover:text-lightTextMain dark:hover:text-darkTextMain transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        </button>
+    </div>
+
+    <script>
+        let currentEmail = '';
+
+        function showAlert(msg, type = 'error') {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = msg;
+            alertBox.className = `w-full p-3 rounded-lg text-sm font-medium border text-center transition-all block ${
+                type === 'error' 
+                ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/30' 
+                : 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800/30'
+            }`;
+            setTimeout(() => alertBox.classList.add('hidden'), 5000);
+        }
+
+        async function requestOtp() {
+            const email = document.getElementById('emailInput').value.trim();
+            if (!email) return showAlert('Pochtani kiriting');
+            
+            try {
+                const res = await fetch('/api/auth/request-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    currentEmail = email;
+                    document.getElementById('step1').classList.add('hidden');
+                    document.getElementById('step2').classList.remove('hidden');
+                    document.getElementById('step2').classList.add('flex');
+                    showAlert(data.message, 'success');
+                } else {
+                    showAlert(data.error);
+                }
+            } catch (err) {
+                showAlert('Server bilan ulanishda xato');
+            }
+        }
+
+        async function verifyOtp() {
+            const otpCode = document.getElementById('otpInput').value.trim();
+            if (otpCode.length !== 4) return showAlert('Kodni to\'liq kiriting');
+
+            try {
+                const res = await fetch('/api/auth/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentEmail, otpCode })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    localStorage.setItem('hub_token', data.token); // Tokenni brauzerga saqlaymiz
+                    showAlert('Muvaffaqiyatli! Tizimga kirilmoqda...', 'success');
+                    setTimeout(() => window.location.href = '/dashboard', 1000); // Keyingi bosqichda yozamiz
+                } else {
+                    showAlert(data.error);
+                }
+            } catch (err) {
+                showAlert('Server bilan ulanishda xato');
+            }
+        }
+
+        async function loginWithInvite() {
+            const email = document.getElementById('emailInput').value.trim();
+            const inviteCode = document.getElementById('inviteCodeInput').value.trim();
+            
+            if (!email || !inviteCode) return showAlert('Pochta va Taklif kodini kiriting');
+
+            try {
+                const res = await fetch('/api/auth/invite-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, inviteCode })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    localStorage.setItem('hub_token', data.token);
+                    showAlert('Muvaffaqiyatli! Tizimga kirilmoqda...', 'success');
+                    setTimeout(() => window.location.href = '/dashboard', 1000);
+                } else {
+                    showAlert(data.error);
+                }
+            } catch (err) {
+                showAlert('Server bilan ulanishda xato');
+            }
+        }
+    </script>
+</body>
+</html>
