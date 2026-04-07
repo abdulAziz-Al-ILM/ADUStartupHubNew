@@ -1,12 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middlewares/authMiddleware');
-const { createProject, getAllProjects, updateProjectStatus } = require('../controllers/projectController');
+const projectController = require('../controllers/projectController');
+const { verifyToken } = require('../middlewares/authMiddleware');
 
-router.use(protect);
+// Barcha loyihalarni ko'rish va qidirish
+router.get('/', verifyToken, projectController.getAllProjects);
 
-router.post('/', createProject);
-router.get('/', getAllProjects); // API manzil: /api/projects?search=Nomi&category=IT_ENGINEER&status=MVP_PREPARATION
-router.put('/:id/status', updateProjectStatus);
+// Yangi loyiha yaratish
+router.post('/', verifyToken, projectController.createProject);
+
+// Loyiha holatini o'zgartirish (AI sabablari bilan)
+router.put('/:id/status', verifyToken, projectController.updateProjectStatus);
 
 module.exports = router;
