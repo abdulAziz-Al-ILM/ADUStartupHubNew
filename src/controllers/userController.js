@@ -1,12 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// "Mock" (soxta) AI filtri - Tizim yonganda xato bermasligi uchun
 const checkTextContent = async (text) => {
   return { isSafe: true, filteredText: text }; 
 };
 
-// Kunlik tahrir limitini tekshirish
 const checkAndResetProfileEditLimit = async (user) => {
   const now = new Date();
   const lastReset = new Date(user.lastResetDate);
@@ -20,9 +18,6 @@ const checkAndResetProfileEditLimit = async (user) => {
   return user;
 };
 
-// ===========================================
-// 1. PROFILNI YANGILASH (Rezyume sozlamalari)
-// ===========================================
 exports.updateProfile = async (req, res) => {
   try {
     const { 
@@ -33,7 +28,6 @@ exports.updateProfile = async (req, res) => {
     let user = await prisma.user.findUnique({ where: { id: req.user.id } });
     if (!user) return res.status(404).json({ error: "Foydalanuvchi topilmadi" });
 
-    // Kunlik limitni tekshirish
     user = await checkAndResetProfileEditLimit(user);
     if (user.dailyProfileEdits >= 2 && user.role !== 'ADMIN') {
       return res.status(403).json({ error: "Kunlik profilni tahrirlash limiti (2 marta) tugadi." });
@@ -83,10 +77,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// ===========================================
-// 2. PROFILNI YUKLASH 
-// (Aynan shu qism yo'qligi uchun Server Crash bo'layotgan edi!)
-// ===========================================
+// AYNAN MANA SHU FUNKSIYA SERVER YONISHI UCHUN KERAK
 exports.getProfile = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
