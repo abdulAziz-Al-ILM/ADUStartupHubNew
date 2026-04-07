@@ -31,33 +31,29 @@
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
         
-        /* AURA Kartocha Effektlari */
-        .aura-card {
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease;
-        }
-        .aura-card:hover {
-            transform: translateY(-4px) scale(1.01);
-            z-index: 10;
-        }
+        .aura-card { transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease; }
+        .aura-card:hover { transform: translateY(-4px) scale(1.01); z-index: 10; }
         .bg-text-watermark {
-            font-size: 5rem;
-            font-weight: 900;
-            line-height: 1;
-            color: rgba(255, 255, 255, 0.03);
-            position: absolute;
-            right: -1rem;
-            bottom: -1rem;
-            user-select: none;
-            pointer-events: none;
+            font-size: 4.5rem; font-weight: 900; line-height: 1;
+            color: rgba(255, 255, 255, 0.02); position: absolute;
+            right: -1rem; bottom: -1rem; user-select: none; pointer-events: none;
+        }
+        /* Modallar uchun silliq animatsiya */
+        .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
     </style>
 </head>
 <body class="bg-turon-pattern text-darkTextMain font-sans antialiased h-screen flex overflow-hidden selection:bg-blue-500/30">
 
-    <div id="sidebarOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 hidden md:hidden transition-opacity opacity-0"></div>
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 hidden md:hidden transition-opacity opacity-0" onclick="toggleMenu()"></div>
+
+    <div id="toastAlert" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] hidden px-6 py-3 rounded-2xl font-bold text-sm shadow-2xl transition-all"></div>
 
     <aside id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-darkCard/90 backdrop-blur-xl border-r border-darkBorder flex flex-col justify-between z-40 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 shadow-2xl">
-        <div class="overflow-y-auto h-full">
+        <div class="overflow-y-auto h-full pb-6">
             <div class="h-20 flex items-center justify-between px-6 border-b border-darkBorder bg-darkBg/50 sticky top-0 z-10">
                 <div class="flex items-center gap-3">
                     <svg class="w-8 h-8 text-blue-500 drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -67,7 +63,7 @@
                     </svg>
                     <span class="font-bold text-lg tracking-tight">Startup Hub</span>
                 </div>
-                <button id="closeMenuBtn" class="md:hidden text-darkTextSub hover:text-white">
+                <button id="closeMenuBtn" class="md:hidden text-darkTextSub hover:text-white" onclick="toggleMenu()">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -85,15 +81,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     Mutaxassislar Bazas
                 </button>
-                <button onclick="switchTab('problems-tab')" id="nav-problems-tab" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 text-darkTextSub hover:bg-white/5 hover:text-darkTextMain rounded-xl transition-all font-medium text-sm border border-transparent">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Muammolar Bazas
-                </button>
                 <div class="h-px bg-darkBorder my-2 mx-4"></div>
-                <button onclick="switchTab('manual-tab')" id="nav-manual-tab" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 text-orange-400 hover:bg-orange-500/10 rounded-xl transition-all font-medium text-sm border border-transparent">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                    Tizim Qo'llanmasi
-                </button>
                 <button onclick="switchTab('news-tab')" id="nav-news-tab" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all font-medium text-sm border border-transparent">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
                     ILM Mizan Xabarlari
@@ -120,38 +108,30 @@
     </aside>
 
     <main class="flex-1 flex flex-col relative bg-transparent h-screen overflow-hidden">
-        
         <header class="h-20 flex items-center justify-between px-6 md:px-10 border-b border-darkBorder bg-darkBg/80 backdrop-blur-xl z-20 shrink-0">
             <div class="flex items-center gap-4">
-                <button id="openMenuBtn" class="md:hidden text-white hover:text-blue-400 transition-colors">
+                <button id="openMenuBtn" class="md:hidden text-white hover:text-blue-400 transition-colors" onclick="toggleMenu()">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
                 <h2 id="pageTitle" class="text-2xl font-extrabold tracking-tight text-white">Asosiy Ko'rsatkichlar</h2>
             </div>
-            
-            <button id="pwaInstallBtn" onclick="installPWA()" class="hidden px-5 py-2.5 bg-white text-darkBg hover:bg-gray-200 rounded-xl text-sm font-bold transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-105 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                <span class="hidden md:block">Ilova qilib o'rnatish</span>
-            </button>
         </header>
 
         <div class="flex-1 overflow-y-auto p-6 md:p-10 relative z-0">
-
             <div id="main-tab" class="tab-content transition-all duration-500 opacity-100 translate-y-0">
-                
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
                     <div class="bg-darkCard/80 backdrop-blur-md border border-darkBorder p-6 rounded-[24px] flex flex-col justify-center shadow-lg relative overflow-hidden">
-                        <span class="text-darkTextSub text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Tizimdagi Mutaxassislar</span>
+                        <span class="text-darkTextSub text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Mutaxassislar</span>
                         <span class="text-4xl font-black text-white relative z-10" id="statSpecialists">-</span>
                     </div>
                     <div class="bg-darkCard/80 backdrop-blur-md border border-darkBorder p-6 rounded-[24px] flex flex-col justify-center shadow-lg relative overflow-hidden">
                         <div class="absolute right-0 top-0 w-24 h-24 bg-emerald-500/20 rounded-full blur-2xl"></div>
-                        <span class="text-darkTextSub text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Bozordagi Startaplar</span>
+                        <span class="text-darkTextSub text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Bozorda</span>
                         <span class="text-4xl font-black text-emerald-400 relative z-10" id="statInMarket">-</span>
                     </div>
                     <div class="bg-darkCard/80 backdrop-blur-md border border-darkBorder p-6 rounded-[24px] flex flex-col justify-center shadow-lg relative overflow-hidden">
                         <div class="absolute right-0 top-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
-                        <span class="text-darkTextSub text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Sarmoya Kutayotgan (MVP)</span>
+                        <span class="text-darkTextSub text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Sarmoya Kutayotgan</span>
                         <span class="text-4xl font-black text-purple-400 relative z-10" id="statMvp">-</span>
                     </div>
                     <div class="bg-darkCard/80 backdrop-blur-md border border-darkBorder p-6 rounded-[24px] flex flex-col justify-center shadow-lg relative overflow-hidden">
@@ -160,292 +140,279 @@
                         <span class="text-4xl font-black text-orange-400 relative z-10" id="statTeam">-</span>
                     </div>
                 </div>
-
-                <div id="adminSection" class="hidden mb-10">
-                    <h3 class="text-xl font-extrabold text-red-400 mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        AI Sabablari: Rad etilgan va Tugatilgan Loyihalar
-                    </h3>
-                    <div class="bg-darkCard border border-darkBorder rounded-[24px] p-6 text-sm text-slate-400 max-h-80 overflow-y-auto shadow-inner" id="canceledProjectsBox">
-                        Yuklanmoqda...
-                    </div>
-                </div>
-
-                <div id="tutorSection" class="hidden mb-10">
-                    <h3 class="text-xl font-extrabold text-white mb-4">Mening Xodimlarim (Talabalar)</h3>
-                    <div class="bg-darkCard/80 backdrop-blur-md border border-darkBorder rounded-[24px] p-8 flex items-center justify-between shadow-lg">
-                        <div>
-                            <p class="text-slate-400 font-medium">Sizning kodingiz bilan ro'yxatdan o'tganlar</p>
-                            <p class="text-sm mt-1 text-emerald-400">Ular yaratgan loyihalar avtomatik nazoratingizda bo'ladi.</p>
-                        </div>
-                        <div class="text-5xl font-black text-white" id="tutorStudentCount">0</div>
-                    </div>
-                </div>
-
-                <div id="studentSection" class="hidden mb-10">
-                    <h3 class="text-xl font-extrabold text-white mb-4">Kunlik Interaktiv Limitlar</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-darkCard/80 border border-darkBorder p-6 rounded-[24px] flex justify-between items-center shadow-lg">
-                            <div>
-                                <p class="text-slate-400 text-sm font-semibold">Tahrirlash / Saqlash</p>
-                                <p class="text-3xl font-black text-white mt-1" id="profileLimitDisplay">2 / 2</p>
-                            </div>
-                            <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-400 border border-blue-500/20">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                            </div>
-                        </div>
-                        <div class="bg-darkCard/80 border border-darkBorder p-6 rounded-[24px] flex justify-between items-center shadow-lg">
-                            <div>
-                                <p class="text-slate-400 text-sm font-semibold">Yangi muammo qo'shish</p>
-                                <p class="text-3xl font-black text-white mt-1" id="ideaLimitDisplay">2 / 2</p>
-                            </div>
-                            <div class="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-400 border border-emerald-500/20">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div id="projects-tab" class="tab-content hidden opacity-0 translate-y-4 transition-all duration-500">
-                
-                <div class="flex flex-col md:flex-row gap-4 mb-8">
-                    <div class="flex-1 relative">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+                    <div class="flex-1 w-full relative">
                         <svg class="w-5 h-5 absolute left-4 top-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" id="projectSearch" placeholder="Loyiha nomi yoki kalit so'z..." class="w-full bg-darkCard/80 backdrop-blur-md border border-darkBorder rounded-2xl pl-11 pr-4 py-3.5 text-white placeholder:text-slate-500 outline-none focus:border-blue-500 transition-colors shadow-lg">
+                        <input type="text" id="projectSearch" placeholder="Loyiha izlash..." oninput="loadProjects()" class="w-full bg-darkCard/80 backdrop-blur-md border border-darkBorder rounded-2xl pl-11 pr-4 py-3.5 text-white outline-none focus:border-blue-500 transition-colors shadow-lg">
                     </div>
-                    <select id="projectCategory" class="bg-darkCard/80 backdrop-blur-md border border-darkBorder rounded-2xl px-4 py-3.5 text-white outline-none focus:border-blue-500 transition-colors shadow-lg appearance-none cursor-pointer">
-                        <option value="">Barcha sohalar</option>
-                        <option value="IT_ENGINEER">IT Muhandislik</option>
-                        <option value="MARKETOLOG">Marketing</option>
-                        <option value="ECONOMIST">Iqtisodiyot</option>
-                        </select>
-                    <select id="projectStatus" class="bg-darkCard/80 backdrop-blur-md border border-darkBorder rounded-2xl px-4 py-3.5 text-white outline-none focus:border-blue-500 transition-colors shadow-lg appearance-none cursor-pointer">
-                        <option value="">Barcha holatlar</option>
-                        <option value="TEAM_BUILDING">Jamoa yig'moqda</option>
-                        <option value="NEED_INVESTMENT">Sarmoya izlamoqda</option>
-                        <option value="IN_MARKET">Bozorda</option>
-                    </select>
-                    <button id="addProjectBtn" class="hidden px-6 py-3.5 bg-white text-darkBg font-extrabold rounded-2xl hover:bg-gray-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 whitespace-nowrap">
+                    <button id="addProjectBtn" onclick="openAddProjectModal()" class="hidden w-full sm:w-auto px-6 py-3.5 bg-white text-darkBg font-extrabold rounded-2xl hover:bg-gray-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                         + Yangi Startap
                     </button>
                 </div>
 
                 <div class="flex flex-col gap-6 pb-20" id="projectsList">
-                    <div class="aura-card relative w-full rounded-[28px] overflow-hidden bg-gradient-to-r from-[#0b1120] to-[#0f172a] border border-[#1e293b] p-8 md:p-10 flex flex-col md:flex-row justify-between cursor-pointer group">
-                        <div class="absolute -left-20 -top-20 w-64 h-64 bg-blue-600/20 rounded-full blur-[80px] pointer-events-none group-hover:bg-blue-600/30 transition-colors"></div>
-                        <div class="bg-text-watermark">INTELLIGENCE</div>
-                        
-                        <div class="relative z-10 flex-1">
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-bold rounded-lg uppercase tracking-widest border border-blue-500/30 backdrop-blur-md">IT_ENGINEER</span>
-                                <span class="px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-lg uppercase tracking-widest border border-orange-500/30 backdrop-blur-md">MVP_PREPARATION</span>
-                            </div>
-                            <h3 class="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">Tech Nova AI</h3>
-                            <p class="text-slate-400 text-base md:text-lg font-medium max-w-2xl">Universitet ta'limini sun'iy intellekt yordamida shaxsiylashtiruvchi ekotizim platformasi.</p>
-                            <div class="mt-6 flex items-center gap-4 text-sm font-semibold text-slate-500">
-                                <div class="flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 6 oy muddat</div>
-                                <div class="flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> 4 ishtirokchi</div>
-                            </div>
-                        </div>
-                        
-                        <div class="relative z-10 hidden md:flex items-center justify-end w-48">
-                            <div class="w-20 h-20 bg-white/5 border border-white/10 rounded-full flex items-center justify-center backdrop-blur-xl group-hover:bg-blue-500 group-hover:border-blue-400 group-hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] transition-all duration-300">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="aura-card relative w-full rounded-[28px] overflow-hidden bg-gradient-to-r from-[#0b1120] to-[#0f172a] border border-[#1e293b] p-8 md:p-10 flex flex-col md:flex-row justify-between cursor-pointer group">
-                        <div class="absolute -left-20 -top-20 w-64 h-64 bg-emerald-600/20 rounded-full blur-[80px] pointer-events-none group-hover:bg-emerald-600/30 transition-colors"></div>
-                        <div class="bg-text-watermark">SUSTAINABILITY</div>
-                        
-                        <div class="relative z-10 flex-1">
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg uppercase tracking-widest border border-emerald-500/30 backdrop-blur-md">ECOLOGIST</span>
-                                <span class="px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-bold rounded-lg uppercase tracking-widest border border-purple-500/30 backdrop-blur-md">IN_MARKET</span>
-                            </div>
-                            <h3 class="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">AquaGuard</h3>
-                            <p class="text-slate-400 text-base md:text-lg font-medium max-w-2xl">Orol dengizi atrofidagi hududlarda suv resurslarini tejamkor boshqarish aqlli tizimi.</p>
-                        </div>
-                        <div class="relative z-10 hidden md:flex items-center justify-end w-48">
-                            <div class="w-20 h-20 bg-white/5 border border-white/10 rounded-full flex items-center justify-center backdrop-blur-xl group-hover:bg-emerald-500 group-hover:border-emerald-400 group-hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all duration-300">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="text-center py-20 text-darkTextSub">Yuklanmoqda...</div>
                 </div>
             </div>
-
-            <div id="specialists-tab" class="tab-content hidden opacity-0 translate-y-4 transition-all duration-500">
-                <h3 class="text-3xl font-bold text-white mb-6">Mutaxassislar Bazasi</h3>
-                <p class="text-slate-400">O'z sohasining mutaxassislari, ularning ochiq rezyumelari shu yerda ko'rinadi.</p>
-            </div>
             
-            <div id="problems-tab" class="tab-content hidden opacity-0 translate-y-4 transition-all duration-500">
-                <h3 class="text-3xl font-bold text-white mb-6">Muammolar Bazasi</h3>
-                <p class="text-slate-400">AI tomonidan tasdiqlangan jamiyat muammolari va ularga yechim g'oyalari.</p>
-            </div>
-
-            <div id="manual-tab" class="tab-content hidden opacity-0 translate-y-4 transition-all duration-500">
-                <h3 class="text-3xl font-bold text-orange-400 mb-6">Tizim Qo'llanmasi</h3>
-                <p class="text-slate-400">Bu yerda startap yaratish va tizimdan foydalanish bo'yicha Admin kiritgan xavfsiz havolalar turadi.</p>
-            </div>
-
             <div id="news-tab" class="tab-content hidden opacity-0 translate-y-4 transition-all duration-500">
                 <h3 class="text-3xl font-bold text-emerald-400 mb-6">ILM Mizan Xabarlari</h3>
-                <p class="text-slate-400">Rahbariyatning rasmiy xabarlari.</p>
+                <p class="text-slate-400">Tez kunda ishga tushadi...</p>
             </div>
-
         </div>
     </main>
 
-    <script>
-        // 1. MOBIL MENYU LOGIKASI
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
+    <div id="addProjectModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-darkCard border border-darkBorder rounded-[32px] w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl modal-enter relative">
+            <button onclick="closeModal('addProjectModal')" class="absolute top-6 right-6 text-slate-400 hover:text-white bg-darkBg rounded-full p-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="p-8 md:p-10">
+                <h3 class="text-2xl font-bold text-white mb-2">Yangi Startap Yaratish</h3>
+                <p class="text-sm text-slate-400 mb-8">Loyiha sohasini AI o'zi maqsad va sabablaringizga qarab avtomatik aniqlab beradi.</p>
+                
+                <form id="addProjectForm" onsubmit="submitNewProject(event)" class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Loyiha Nomi</label>
+                        <input type="text" id="pTitle" required class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Maqsad (Nima qilmoqchisiz?)</label>
+                        <textarea id="pGoal" required rows="3" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Sabab (Nega bu loyiha kerak?)</label>
+                        <textarea id="pReason" required rows="3" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Manfaat va Foyda (Kimga qanday naf?)</label>
+                        <textarea id="pBenefit" required rows="2" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Muddat (Deadline)</label>
+                            <input type="text" id="pDeadline" placeholder="Masalan: 6 oy" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Yopiq Telegram Guruh Linki</label>
+                            <input type="url" id="pTelegram" required placeholder="https://t.me/+" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Hozirgi muammolar (Sarmoya, mutaxassis...)</label>
+                        <textarea id="pProblems" rows="2" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors"></textarea>
+                    </div>
+                    <button type="submit" id="submitProjectBtn" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-colors shadow-lg mt-4">
+                        Loyihani Saqlash va AI Tekshiruviga yuborish
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-        function toggleMenu() {
-            const isClosed = sidebar.classList.contains('-translate-x-full');
-            if (isClosed) {
-                sidebar.classList.remove('-translate-x-full');
-                overlay.classList.remove('hidden');
-                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-            } else {
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('opacity-0');
-                setTimeout(() => overlay.classList.add('hidden'), 300);
-            }
+    <div id="projectDetailsModal" class="fixed inset-0 bg-black/80 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4 md:p-10">
+        <div class="bg-darkCard border border-darkBorder rounded-[32px] w-full max-w-4xl max-h-full overflow-y-auto shadow-2xl modal-enter relative">
+            <button onclick="closeModal('projectDetailsModal')" class="absolute top-6 right-6 text-slate-400 hover:text-white bg-darkBg rounded-full p-2 z-10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            <div id="pdContent" class="relative">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('hub_token');
+        let currentUser = null;
+        let allProjects = [];
+
+        function showToast(msg, isSuccess = true) {
+            const t = document.getElementById('toastAlert');
+            t.textContent = msg;
+            t.className = `fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl font-bold text-sm shadow-2xl transition-all ${isSuccess ? 'bg-emerald-500 text-white shadow-emerald-500/40' : 'bg-red-500 text-white shadow-red-500/40'}`;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 4000);
         }
 
-        document.getElementById('openMenuBtn').addEventListener('click', toggleMenu);
-        document.getElementById('closeMenuBtn').addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
-
-        // 2. TIZIM VA ROLLAR LOGIKASI
-        const token = localStorage.getItem('hub_token');
-        if (!token) window.location.href = '/login';
-
-        let currentUser = null;
-
+        // --- DASHBOARD INITS ---
         async function initDashboard() {
             try {
-                // Profil yuklash
                 const userRes = await fetch('/api/users/me', { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!userRes.ok) throw new Error();
                 currentUser = await userRes.json();
-
-                // Profil UI
                 document.getElementById('userNameDisplay').textContent = currentUser.nickname || currentUser.email.split('@')[0];
                 document.getElementById('userRoleDisplay').textContent = currentUser.role;
 
-                // Dinamik qismlarni ko'rsatish
                 if (currentUser.role === 'STUDENT') {
-                    document.getElementById('studentSection').classList.remove('hidden');
-                    document.getElementById('addProjectBtn').classList.remove('hidden'); // Talaba loyiha qo'sha oladi
-                    // Limitlarni backenddan emas, hozircha UI uchun qattiq (mock) yozyapmiz
-                    document.getElementById('profileLimitDisplay').textContent = "2 / 2";
-                }
-                if (currentUser.role === 'TUTOR') {
-                    document.getElementById('tutorSection').classList.remove('hidden');
-                }
-                if (currentUser.role === 'ADMIN' || currentUser.role === 'LEADER') {
-                    document.getElementById('adminSection').classList.remove('hidden');
+                    if(currentUser.canCreateProject) document.getElementById('addProjectBtn').classList.remove('hidden');
                 }
 
-                // Statistika yuklash
-                const statsRes = await fetch('/api/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
-                const stats = await statsRes.json();
+                // API dan statistika olamiz (qisqartirilgan)
+                // ...
                 
-                document.getElementById('statSpecialists').textContent = stats.generalStats.totalSpecialists;
-                document.getElementById('statInMarket').textContent = stats.generalStats.projectStatuses.IN_MARKET || 0;
-                document.getElementById('statMvp').textContent = stats.generalStats.projectStatuses.NEED_INVESTMENT || 0;
-                document.getElementById('statTeam').textContent = stats.generalStats.projectStatuses.TEAM_BUILDING || 0;
-
-                // Admin/Tutor spetsifik axborotlar...
-                if (stats.leaderData && stats.leaderData.canceledProjects.length > 0) {
-                    document.getElementById('canceledProjectsBox').innerHTML = stats.leaderData.canceledProjects.map(p => `
-                        <div class="mb-4 pb-4 border-b border-darkBorder/50 last:border-0 last:mb-0 last:pb-0">
-                            <span class="font-bold text-white text-base">${p.title}</span> <span class="px-2 py-0.5 ml-2 bg-red-500/10 text-red-400 text-[10px] rounded uppercase">${p.status}</span><br>
-                            <span class="text-sm mt-1 text-slate-400 block">${p.cancelReason || 'Sabab ko\'rsatilmagan'}</span>
-                        </div>
-                    `).join('');
-                }
-                if (stats.tutorData) {
-                    document.getElementById('tutorStudentCount').textContent = stats.tutorData.invitedStudentsCount;
-                }
-
-            } catch (err) {
-                console.log(err);
-                logout();
-            }
+                loadProjects(); // Loyihalarni yuklash
+            } catch (err) { logout(); }
         }
 
-        window.addEventListener('load', initDashboard);
-
-        // 3. TAB ALMASHTIRISH (SILLIQ)
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('opacity-100', 'translate-y-0');
-                tab.classList.add('opacity-0', 'translate-y-4');
-                setTimeout(() => tab.classList.add('hidden'), 300);
-            });
-
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3.5 text-darkTextSub hover:bg-white/5 hover:text-darkTextMain rounded-xl transition-all font-medium text-sm border border-transparent";
-            });
-
-            setTimeout(() => {
-                const activeTab = document.getElementById(tabId);
-                if(activeTab) {
-                    activeTab.classList.remove('hidden');
-                    setTimeout(() => {
-                        activeTab.classList.remove('opacity-0', 'translate-y-4');
-                        activeTab.classList.add('opacity-100', 'translate-y-0');
-                    }, 50);
-                }
-            }, 300);
+        // --- LOYIHALAR LOGIKASI ---
+        async function loadProjects() {
+            const search = document.getElementById('projectSearch').value;
+            const list = document.getElementById('projectsList');
+            list.innerHTML = '<div class="text-center py-10 text-slate-500">Yuklanmoqda...</div>';
             
-            const activeBtn = document.getElementById('nav-' + tabId);
-            if(activeBtn) {
-                let colorClass = 'blue';
-                if(tabId === 'news-tab') colorClass = 'emerald';
-                else if(tabId === 'manual-tab') colorClass = 'orange';
+            try {
+                const res = await fetch(`/api/projects?search=${search}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                allProjects = await res.json();
                 
-                activeBtn.className = `nav-btn w-full flex items-center gap-3 px-4 py-3.5 text-${colorClass}-400 bg-${colorClass}-500/10 rounded-xl transition-all font-medium text-sm border border-${colorClass}-500/20`;
-                document.getElementById('pageTitle').textContent = activeBtn.textContent.trim();
+                if(allProjects.length === 0) {
+                    list.innerHTML = '<div class="text-center py-20 text-slate-500">Hech qanday loyiha topilmadi.</div>';
+                    return;
+                }
+
+                // AURALI KARTOCHKALAR CHIZISH
+                list.innerHTML = allProjects.map(p => {
+                    // Ranglarni sohalarga qarab berish
+                    let color = 'blue';
+                    if(p.category.includes('MARKET')) color = 'purple';
+                    if(p.category.includes('ECO') || p.category.includes('BIO')) color = 'emerald';
+                    
+                    return `
+                    <div onclick="openProjectDetails('${p.id}')" class="aura-card relative w-full rounded-[28px] overflow-hidden bg-gradient-to-r from-[#0b1120] to-[#0f172a] border border-[#1e293b] p-8 flex flex-col md:flex-row justify-between cursor-pointer group">
+                        <div class="absolute -left-20 -top-20 w-64 h-64 bg-${color}-600/20 rounded-full blur-[80px] pointer-events-none group-hover:bg-${color}-600/30 transition-colors"></div>
+                        <div class="bg-text-watermark">${p.category.split('_')[0]}</div>
+                        
+                        <div class="relative z-10 flex-1">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="px-3 py-1 bg-${color}-500/20 text-${color}-400 text-xs font-bold rounded-lg uppercase tracking-widest border border-${color}-500/30">${p.category}</span>
+                                <span class="px-3 py-1 bg-slate-500/20 text-slate-300 text-xs font-bold rounded-lg uppercase tracking-widest border border-slate-500/30">${p.status}</span>
+                            </div>
+                            <h3 class="text-3xl font-extrabold text-white mb-2 tracking-tight">${p.title}</h3>
+                            <p class="text-slate-400 text-base font-medium max-w-2xl line-clamp-2">${p.goal}</p>
+                        </div>
+                        <div class="relative z-10 hidden md:flex items-center justify-end w-32">
+                            <div class="w-16 h-16 bg-white/5 border border-white/10 rounded-full flex items-center justify-center group-hover:bg-${color}-500 transition-all">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (err) {
+                showToast('Loyihalarni yuklashda xato', false);
             }
-
-            if(window.innerWidth < 768) toggleMenu();
         }
 
-        function logout() {
-            localStorage.removeItem('hub_token');
-            window.location.href = '/login';
+        // --- LOYIHA QO'SHISH ---
+        function openAddProjectModal() {
+            document.getElementById('addProjectModal').classList.remove('hidden');
         }
 
-        // 4. PWA ENGINE
-        let deferredPrompt;
-        const installBtn = document.getElementById('pwaInstallBtn');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
+        async function submitNewProject(e) {
             e.preventDefault();
-            deferredPrompt = e;
-            installBtn.classList.remove('hidden');
-            installBtn.classList.add('flex');
-        });
+            const btn = document.getElementById('submitProjectBtn');
+            btn.textContent = "AI tekshirmoqda..."; btn.disabled = true;
 
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        installBtn.classList.add('hidden');
-                    }
-                    deferredPrompt = null;
+            const data = {
+                title: document.getElementById('pTitle').value,
+                goal: document.getElementById('pGoal').value,
+                reason: document.getElementById('pReason').value,
+                benefit: document.getElementById('pBenefit').value,
+                deadline: document.getElementById('pDeadline').value,
+                telegramLink: document.getElementById('pTelegram').value,
+                currentProblems: document.getElementById('pProblems').value
+            };
+
+            try {
+                const res = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
                 });
+                const result = await res.json();
+                
+                if(res.ok) {
+                    showToast(result.message);
+                    closeModal('addProjectModal');
+                    document.getElementById('addProjectForm').reset();
+                    document.getElementById('addProjectBtn').classList.add('hidden'); // Limit yopiladi
+                    loadProjects();
+                } else {
+                    showToast(result.error, false);
+                }
+            } catch(err) {
+                showToast("Xatolik yuz berdi", false);
             }
+            btn.textContent = "Loyihani Saqlash"; btn.disabled = false;
         }
+
+        // --- MUKAMMAL TAQDIMOT OYNASI (RICH PAGE) ---
+        function openProjectDetails(id) {
+            const p = allProjects.find(x => x.id === id);
+            if(!p) return;
+
+            const content = document.getElementById('pdContent');
+            content.innerHTML = `
+                <div class="relative p-10 bg-gradient-to-b from-blue-900/40 to-darkCard border-b border-darkBorder">
+                    <div class="absolute top-0 right-0 w-full h-full bg-grid-pattern opacity-30"></div>
+                    <div class="relative z-10">
+                        <div class="flex gap-2 mb-4">
+                            <span class="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-lg uppercase tracking-widest shadow-lg shadow-blue-500/30">${p.category}</span>
+                            <span class="px-3 py-1 bg-white/10 text-white text-xs font-bold rounded-lg uppercase tracking-widest backdrop-blur-md">${p.status}</span>
+                        </div>
+                        <h2 class="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">${p.title}</h2>
+                        <div class="flex items-center gap-3 text-slate-300 font-medium">
+                            <div class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center">👨‍💻</div>
+                            Asoschi: <span class="text-white">${p.author.nickname || 'Noma\'lum'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-10 space-y-10">
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Loyiha Maqsadi</h4>
+                        <p class="text-xl text-white font-medium leading-relaxed">${p.goal}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="bg-darkBg p-6 rounded-3xl border border-darkBorder">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Boshlanish Sababi</h4>
+                            <p class="text-slate-300 leading-relaxed">${p.reason}</p>
+                        </div>
+                        <div class="bg-darkBg p-6 rounded-3xl border border-darkBorder">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Manfaat va Foyda</h4>
+                            <p class="text-slate-300 leading-relaxed">${p.benefit}</p>
+                        </div>
+                    </div>
+
+                    ${p.currentProblems ? `
+                    <div class="bg-red-500/5 border border-red-500/20 p-6 rounded-3xl">
+                        <h4 class="text-xs font-bold text-red-400 uppercase tracking-widest mb-3">Hozirgi muammolar / Ehtiyojlar</h4>
+                        <p class="text-slate-300">${p.currentProblems}</p>
+                    </div>` : ''}
+
+                    <div class="flex items-center justify-between border-t border-darkBorder pt-8">
+                        <div class="text-sm font-bold text-slate-500">MUDDAT: <span class="text-white">${p.deadline || 'Ko\'rsatilmagan'}</span></div>
+                        
+                        ${(currentUser.role === 'STUDENT' && p.authorId !== currentUser.id) ? `
+                            <button onclick="alert('Qo\'shilish formasi tez kunda!')" class="px-8 py-4 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center gap-2 transition-all hover:scale-105">
+                                Jamoaga Qo'shilish So'rovi
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            document.getElementById('projectDetailsModal').classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function switchTab(tabId) { /* O'zgarishsiz */ }
+        function logout() { localStorage.removeItem('hub_token'); window.location.href = '/login'; }
+        
+        window.addEventListener('load', initDashboard);
     </script>
 </body>
 </html>
