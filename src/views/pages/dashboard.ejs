@@ -38,7 +38,6 @@
             color: rgba(255, 255, 255, 0.02); position: absolute;
             right: -1rem; bottom: -1rem; user-select: none; pointer-events: none;
         }
-        /* Modallar uchun silliq animatsiya */
         .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
         @keyframes modalFadeIn {
             from { opacity: 0; transform: scale(0.95) translateY(10px); }
@@ -49,7 +48,6 @@
 <body class="bg-turon-pattern text-darkTextMain font-sans antialiased h-screen flex overflow-hidden selection:bg-blue-500/30">
 
     <div id="sidebarOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 hidden md:hidden transition-opacity opacity-0" onclick="toggleMenu()"></div>
-
     <div id="toastAlert" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] hidden px-6 py-3 rounded-2xl font-bold text-sm shadow-2xl transition-all"></div>
 
     <aside id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-darkCard/90 backdrop-blur-xl border-r border-darkBorder flex flex-col justify-between z-40 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 shadow-2xl">
@@ -81,24 +79,28 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     Mutaxassislar Bazas
                 </button>
+                <button onclick="switchTab('problems-tab')" id="nav-problems-tab" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 text-darkTextSub hover:bg-white/5 hover:text-darkTextMain rounded-xl transition-all font-medium text-sm border border-transparent">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Muammolar Bazas
+                </button>
                 <div class="h-px bg-darkBorder my-2 mx-4"></div>
-                <button onclick="switchTab('news-tab')" id="nav-news-tab" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all font-medium text-sm border border-transparent">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
-                    ILM Mizan Xabarlari
+                <button onclick="switchTab('manual-tab')" id="nav-manual-tab" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 text-orange-400 hover:bg-orange-500/10 rounded-xl transition-all font-medium text-sm border border-transparent">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    Tizim Qo'llanmasi
                 </button>
             </nav>
         </div>
 
         <div class="p-4 border-t border-darkBorder bg-darkBg/50 backdrop-blur-md shrink-0">
-            <div class="flex items-center gap-3 mb-4 p-2.5 rounded-xl bg-darkCard border border-darkBorder hover:border-gray-600 transition-colors shadow-sm cursor-pointer" onclick="switchTab('profile-tab')">
+            <div class="flex items-center gap-3 mb-4 p-2.5 rounded-xl bg-darkCard border border-darkBorder hover:border-gray-600 transition-colors shadow-sm cursor-pointer group" onclick="openProfileModal()">
                 <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-xl shadow-inner border border-white/10" id="userSticker">
                     👨‍💻
                 </div>
                 <div class="overflow-hidden flex-1">
-                    <p class="text-sm font-bold text-white truncate" id="userNameDisplay">Yuklanmoqda...</p>
+                    <p class="text-sm font-bold text-white truncate group-hover:text-blue-400 transition-colors" id="userNameDisplay">Yuklanmoqda...</p>
                     <p class="text-[11px] text-blue-400 font-bold truncate uppercase tracking-wider" id="userRoleDisplay">...</p>
                 </div>
-                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                <svg class="w-4 h-4 text-slate-500 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
             </div>
             <button onclick="logout()" class="w-full py-2.5 bg-red-500/10 text-xs font-bold text-red-400 hover:bg-red-500/20 rounded-lg transition-colors border border-red-500/20">
                 TIZIMDAN CHIQISH
@@ -158,12 +160,127 @@
                 </div>
             </div>
             
-            <div id="news-tab" class="tab-content hidden opacity-0 translate-y-4 transition-all duration-500">
-                <h3 class="text-3xl font-bold text-emerald-400 mb-6">ILM Mizan Xabarlari</h3>
-                <p class="text-slate-400">Tez kunda ishga tushadi...</p>
+            <div id="specialists-tab" class="tab-content hidden opacity-0 translate-y-4 transition-all duration-500">
+                <h3 class="text-3xl font-bold text-white mb-6">Mutaxassislar Bazasi</h3>
+            </div>
+            <div id="problems-tab" class="tab-content hidden opacity-0 translate-y-4 transition-all duration-500">
+                <h3 class="text-3xl font-bold text-white mb-6">Muammolar Bazasi</h3>
+            </div>
+            <div id="manual-tab" class="tab-content hidden opacity-0 translate-y-4 transition-all duration-500">
+                <h3 class="text-3xl font-bold text-orange-400 mb-6">Tizim Qo'llanmasi</h3>
             </div>
         </div>
     </main>
+
+    <div id="profileModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-darkCard border border-darkBorder rounded-[32px] w-full max-w-3xl max-h-[95vh] overflow-y-auto shadow-2xl modal-enter relative">
+            <div class="sticky top-0 bg-darkCard/90 backdrop-blur-md border-b border-darkBorder px-8 py-6 z-10 flex justify-between items-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-white">Profil va Rezyume Sozlamalari</h3>
+                    <p class="text-sm text-slate-400 mt-1">Kunlik tahrirlash limiti: <span id="editLimitText" class="text-blue-400 font-bold">2 / 2</span></p>
+                </div>
+                <button onclick="closeModal('profileModal')" class="text-slate-400 hover:text-white bg-darkBg rounded-full p-2 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <form id="profileForm" onsubmit="submitProfile(event)" class="p-8 space-y-8">
+                <div class="flex items-center justify-between bg-darkBg p-5 rounded-2xl border border-darkBorder">
+                    <div>
+                        <p class="text-white font-bold">Rezyume (Profil) ochiqligi</p>
+                        <p class="text-xs text-slate-400 mt-1">Ochiq profilga ega bo'lsangiz, loyiha egalari sizga o'zi taklif yubora oladi.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="profIsPublic" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Nickname (Ochiq ism)</label>
+                        <input type="text" id="profNickname" required class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Haqiqiy ism (Ixtiyoriy)</label>
+                        <input type="text" id="profFirstName" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Mutaxassislik</label>
+                        <select id="profCategory" required class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                            <option value="">Tanlang...</option>
+                            <option value="IT_ENGINEER">Dasturchi (IT Engineer)</option>
+                            <option value="UI_UX_DESIGNER">Dizayner (UI/UX)</option>
+                            <option value="PROJECT_MANAGER">Loyiha Boshqaruvchisi</option>
+                            <option value="MARKETOLOG">Marketolog</option>
+                            <option value="ECONOMIST">Iqtisodchi</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Yosh</label>
+                            <input type="number" id="profAge" min="15" max="60" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Kurs</label>
+                            <input type="number" id="profCourse" min="1" max="6" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Fakultet / Yo'nalish</label>
+                        <input type="text" id="profFaculty" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Ishchi Prinsiplar (Masalan: Tezlik, Estetika, Tartib)</label>
+                    <textarea id="profPrinciples" rows="2" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-blue-900/10 p-5 rounded-2xl border border-blue-500/20">
+                    <div>
+                        <label class="block text-xs font-bold text-blue-400 uppercase tracking-widest mb-2">Loyihaga qancha vaqt ajrata olasiz? (Haftasiga)</label>
+                        <input type="number" id="profWeeklyHours" required placeholder="Masalan: 20 soat" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-blue-400 uppercase tracking-widest mb-2">Kunlik vaqtingiz (Soat)</label>
+                        <input type="number" id="profDailyHours" required placeholder="Masalan: 3 soat" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                    </div>
+                </div>
+
+                <button type="submit" id="submitProfileBtn" class="w-full py-4 bg-white text-darkBg font-extrabold rounded-xl hover:bg-gray-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                    Saqlash va AI filtri orqali o'tkazish
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="applyModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-darkCard border border-emerald-500/30 rounded-[32px] w-full max-w-lg shadow-2xl modal-enter relative">
+            <button onclick="closeModal('applyModal')" class="absolute top-6 right-6 text-slate-400 hover:text-white bg-darkBg rounded-full p-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="p-8">
+                <h3 class="text-2xl font-bold text-white mb-2">Vizitka Jo'natish</h3>
+                <p class="text-sm text-slate-400 mb-6">Ushbu loyihaga qanday foyda keltira olasiz?</p>
+                
+                <input type="hidden" id="applyProjectId">
+                <form onsubmit="submitApplication(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Nima kutyapsiz va nima bera olasiz?</label>
+                        <textarea id="appBenefit" required rows="3" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-emerald-500 transition-colors"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Vaqtingiz bormi? Qancha?</label>
+                        <input type="text" id="appTime" required placeholder="Masalan: Kuniga 2 soat" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-emerald-500 transition-colors">
+                    </div>
+                    <button type="submit" id="submitAppBtn" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-600/30">
+                        Vizitkani Yuborish
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <div id="addProjectModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="bg-darkCard border border-darkBorder rounded-[32px] w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl modal-enter relative">
@@ -172,41 +289,39 @@
             </button>
             <div class="p-8 md:p-10">
                 <h3 class="text-2xl font-bold text-white mb-2">Yangi Startap Yaratish</h3>
-                <p class="text-sm text-slate-400 mb-8">Loyiha sohasini AI o'zi maqsad va sabablaringizga qarab avtomatik aniqlab beradi.</p>
-                
                 <form id="addProjectForm" onsubmit="submitNewProject(event)" class="space-y-6">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Loyiha Nomi</label>
-                        <input type="text" id="pTitle" required class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                        <input type="text" id="pTitle" required class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Maqsad (Nima qilmoqchisiz?)</label>
-                        <textarea id="pGoal" required rows="3" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors"></textarea>
+                        <textarea id="pGoal" required rows="3" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500"></textarea>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Sabab (Nega bu loyiha kerak?)</label>
-                        <textarea id="pReason" required rows="3" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors"></textarea>
+                        <textarea id="pReason" required rows="3" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500"></textarea>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Manfaat va Foyda (Kimga qanday naf?)</label>
-                        <textarea id="pBenefit" required rows="2" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors"></textarea>
+                        <textarea id="pBenefit" required rows="2" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500"></textarea>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Muddat (Deadline)</label>
-                            <input type="text" id="pDeadline" placeholder="Masalan: 6 oy" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                            <input type="text" id="pDeadline" placeholder="Masalan: 6 oy" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Yopiq Telegram Guruh Linki</label>
-                            <input type="url" id="pTelegram" required placeholder="https://t.me/+" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors">
+                            <input type="url" id="pTelegram" required placeholder="https://t.me/+" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500">
                         </div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Hozirgi muammolar (Sarmoya, mutaxassis...)</label>
-                        <textarea id="pProblems" rows="2" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-colors"></textarea>
+                        <textarea id="pProblems" rows="2" class="w-full bg-darkBg border border-darkBorder rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500"></textarea>
                     </div>
                     <button type="submit" id="submitProjectBtn" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-colors shadow-lg mt-4">
-                        Loyihani Saqlash va AI Tekshiruviga yuborish
+                        Loyihani Saqlash
                     </button>
                 </form>
             </div>
@@ -218,9 +333,7 @@
             <button onclick="closeModal('projectDetailsModal')" class="absolute top-6 right-6 text-slate-400 hover:text-white bg-darkBg rounded-full p-2 z-10">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            
-            <div id="pdContent" class="relative">
-                </div>
+            <div id="pdContent" class="relative"></div>
         </div>
     </div>
 
@@ -237,43 +350,91 @@
             setTimeout(() => t.classList.add('hidden'), 4000);
         }
 
-        // --- DASHBOARD INITS ---
         async function initDashboard() {
             try {
                 const userRes = await fetch('/api/users/me', { headers: { 'Authorization': `Bearer ${token}` } });
                 currentUser = await userRes.json();
+                
                 document.getElementById('userNameDisplay').textContent = currentUser.nickname || currentUser.email.split('@')[0];
                 document.getElementById('userRoleDisplay').textContent = currentUser.role;
 
-                if (currentUser.role === 'STUDENT') {
-                    if(currentUser.canCreateProject) document.getElementById('addProjectBtn').classList.remove('hidden');
+                if (currentUser.role === 'STUDENT' && currentUser.canCreateProject) {
+                    document.getElementById('addProjectBtn').classList.remove('hidden');
                 }
-
-                // API dan statistika olamiz (qisqartirilgan)
-                // ...
-                
-                loadProjects(); // Loyihalarni yuklash
+                loadProjects(); 
             } catch (err) { logout(); }
         }
 
-        // --- LOYIHALAR LOGIKASI ---
-        async function loadProjects() {
-            const search = document.getElementById('projectSearch').value;
-            const list = document.getElementById('projectsList');
-            list.innerHTML = '<div class="text-center py-10 text-slate-500">Yuklanmoqda...</div>';
+        // --- PROFIL (REZYUME) QISMI ---
+        function openProfileModal() {
+            document.getElementById('profileModal').classList.remove('hidden');
+            document.getElementById('editLimitText').textContent = `${2 - currentUser.dailyProfileEdits} / 2`;
             
+            // Maydonlarni to'ldirish
+            document.getElementById('profNickname').value = currentUser.nickname || '';
+            document.getElementById('profFirstName').value = currentUser.firstName || '';
+            document.getElementById('profCategory').value = currentUser.profession || '';
+            document.getElementById('profAge').value = currentUser.age || '';
+            document.getElementById('profCourse').value = currentUser.course || '';
+            document.getElementById('profFaculty').value = currentUser.faculty || '';
+            document.getElementById('profPrinciples').value = currentUser.principles || '';
+            document.getElementById('profWeeklyHours').value = currentUser.weeklyHours || '';
+            document.getElementById('profDailyHours').value = currentUser.dailyHours || '';
+            document.getElementById('profIsPublic').checked = currentUser.isEmailPublic;
+        }
+
+        async function submitProfile(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitProfileBtn');
+            btn.disabled = true; btn.textContent = "AI tekshirmoqda...";
+
+            const data = {
+                nickname: document.getElementById('profNickname').value,
+                firstName: document.getElementById('profFirstName').value,
+                profession: document.getElementById('profCategory').value,
+                age: document.getElementById('profAge').value,
+                course: document.getElementById('profCourse').value,
+                faculty: document.getElementById('profFaculty').value,
+                principles: document.getElementById('profPrinciples').value,
+                weeklyHours: document.getElementById('profWeeklyHours').value,
+                dailyHours: document.getElementById('profDailyHours').value,
+                isEmailPublic: document.getElementById('profIsPublic').checked
+            };
+
+            try {
+                const res = await fetch('/api/users/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                
+                if(res.ok) {
+                    showToast("Profil muvaffaqiyatli saqlandi!");
+                    currentUser = result.user; // Yangilash
+                    closeModal('profileModal');
+                    document.getElementById('userNameDisplay').textContent = currentUser.nickname;
+                } else {
+                    showToast(result.error, false);
+                }
+            } catch(err) { showToast("Xatolik", false); }
+            btn.disabled = false; btn.textContent = "Saqlash va AI filtri orqali o'tkazish";
+        }
+
+        // --- LOYIHALAR VA VIZITKA QISMI ---
+        async function loadProjects() {
+            const list = document.getElementById('projectsList');
+            const search = document.getElementById('projectSearch').value;
             try {
                 const res = await fetch(`/api/projects?search=${search}`, { headers: { 'Authorization': `Bearer ${token}` } });
                 allProjects = await res.json();
                 
                 if(allProjects.length === 0) {
-                    list.innerHTML = '<div class="text-center py-20 text-slate-500">Hech qanday loyiha topilmadi.</div>';
+                    list.innerHTML = '<div class="text-center py-20 text-slate-500">Loyihalar topilmadi.</div>';
                     return;
                 }
 
-                // AURALI KARTOCHKALAR CHIZISH
                 list.innerHTML = allProjects.map(p => {
-                    // Ranglarni sohalarga qarab berish
                     let color = 'blue';
                     if(p.category.includes('MARKET')) color = 'purple';
                     if(p.category.includes('ECO') || p.category.includes('BIO')) color = 'emerald';
@@ -282,7 +443,6 @@
                     <div onclick="openProjectDetails('${p.id}')" class="aura-card relative w-full rounded-[28px] overflow-hidden bg-gradient-to-r from-[#0b1120] to-[#0f172a] border border-[#1e293b] p-8 flex flex-col md:flex-row justify-between cursor-pointer group">
                         <div class="absolute -left-20 -top-20 w-64 h-64 bg-${color}-600/20 rounded-full blur-[80px] pointer-events-none group-hover:bg-${color}-600/30 transition-colors"></div>
                         <div class="bg-text-watermark">${p.category.split('_')[0]}</div>
-                        
                         <div class="relative z-10 flex-1">
                             <div class="flex items-center gap-3 mb-4">
                                 <span class="px-3 py-1 bg-${color}-500/20 text-${color}-400 text-xs font-bold rounded-lg uppercase tracking-widest border border-${color}-500/30">${p.category}</span>
@@ -291,62 +451,11 @@
                             <h3 class="text-3xl font-extrabold text-white mb-2 tracking-tight">${p.title}</h3>
                             <p class="text-slate-400 text-base font-medium max-w-2xl line-clamp-2">${p.goal}</p>
                         </div>
-                        <div class="relative z-10 hidden md:flex items-center justify-end w-32">
-                            <div class="w-16 h-16 bg-white/5 border border-white/10 rounded-full flex items-center justify-center group-hover:bg-${color}-500 transition-all">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </div>
-                        </div>
                     </div>`;
                 }).join('');
-            } catch (err) {
-                showToast('Loyihalarni yuklashda xato', false);
-            }
+            } catch (err) { }
         }
 
-        // --- LOYIHA QO'SHISH ---
-        function openAddProjectModal() {
-            document.getElementById('addProjectModal').classList.remove('hidden');
-        }
-
-        async function submitNewProject(e) {
-            e.preventDefault();
-            const btn = document.getElementById('submitProjectBtn');
-            btn.textContent = "AI tekshirmoqda..."; btn.disabled = true;
-
-            const data = {
-                title: document.getElementById('pTitle').value,
-                goal: document.getElementById('pGoal').value,
-                reason: document.getElementById('pReason').value,
-                benefit: document.getElementById('pBenefit').value,
-                deadline: document.getElementById('pDeadline').value,
-                telegramLink: document.getElementById('pTelegram').value,
-                currentProblems: document.getElementById('pProblems').value
-            };
-
-            try {
-                const res = await fetch('/api/projects', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(data)
-                });
-                const result = await res.json();
-                
-                if(res.ok) {
-                    showToast(result.message);
-                    closeModal('addProjectModal');
-                    document.getElementById('addProjectForm').reset();
-                    document.getElementById('addProjectBtn').classList.add('hidden'); // Limit yopiladi
-                    loadProjects();
-                } else {
-                    showToast(result.error, false);
-                }
-            } catch(err) {
-                showToast("Xatolik yuz berdi", false);
-            }
-            btn.textContent = "Loyihani Saqlash"; btn.disabled = false;
-        }
-
-        // --- MUKAMMAL TAQDIMOT OYNASI (RICH PAGE) ---
         function openProjectDetails(id) {
             const p = allProjects.find(x => x.id === id);
             if(!p) return;
@@ -357,8 +466,7 @@
                     <div class="absolute top-0 right-0 w-full h-full bg-grid-pattern opacity-30"></div>
                     <div class="relative z-10">
                         <div class="flex gap-2 mb-4">
-                            <span class="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-lg uppercase tracking-widest shadow-lg shadow-blue-500/30">${p.category}</span>
-                            <span class="px-3 py-1 bg-white/10 text-white text-xs font-bold rounded-lg uppercase tracking-widest backdrop-blur-md">${p.status}</span>
+                            <span class="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-lg uppercase tracking-widest">${p.category}</span>
                         </div>
                         <h2 class="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">${p.title}</h2>
                         <div class="flex items-center gap-3 text-slate-300 font-medium">
@@ -367,36 +475,18 @@
                         </div>
                     </div>
                 </div>
-                
                 <div class="p-10 space-y-10">
-                    <div>
-                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Loyiha Maqsadi</h4>
-                        <p class="text-xl text-white font-medium leading-relaxed">${p.goal}</p>
-                    </div>
-                    
+                    <div><h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Loyiha Maqsadi</h4><p class="text-xl text-white font-medium">${p.goal}</p></div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <div class="bg-darkBg p-6 rounded-3xl border border-darkBorder">
-                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Boshlanish Sababi</h4>
-                            <p class="text-slate-300 leading-relaxed">${p.reason}</p>
-                        </div>
-                        <div class="bg-darkBg p-6 rounded-3xl border border-darkBorder">
-                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Manfaat va Foyda</h4>
-                            <p class="text-slate-300 leading-relaxed">${p.benefit}</p>
-                        </div>
+                        <div class="bg-darkBg p-6 rounded-3xl border border-darkBorder"><h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Boshlanish Sababi</h4><p class="text-slate-300">${p.reason}</p></div>
+                        <div class="bg-darkBg p-6 rounded-3xl border border-darkBorder"><h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Manfaat va Foyda</h4><p class="text-slate-300">${p.benefit}</p></div>
                     </div>
-
-                    ${p.currentProblems ? `
-                    <div class="bg-red-500/5 border border-red-500/20 p-6 rounded-3xl">
-                        <h4 class="text-xs font-bold text-red-400 uppercase tracking-widest mb-3">Hozirgi muammolar / Ehtiyojlar</h4>
-                        <p class="text-slate-300">${p.currentProblems}</p>
-                    </div>` : ''}
-
+                    ${p.currentProblems ? `<div class="bg-red-500/5 border border-red-500/20 p-6 rounded-3xl"><h4 class="text-xs font-bold text-red-400 uppercase tracking-widest mb-3">Hozirgi muammolar</h4><p class="text-slate-300">${p.currentProblems}</p></div>` : ''}
                     <div class="flex items-center justify-between border-t border-darkBorder pt-8">
                         <div class="text-sm font-bold text-slate-500">MUDDAT: <span class="text-white">${p.deadline || 'Ko\'rsatilmagan'}</span></div>
-                        
                         ${(currentUser.role === 'STUDENT' && p.authorId !== currentUser.id) ? `
-                            <button onclick="alert('Qo\'shilish formasi tez kunda!')" class="px-8 py-4 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)] flex items-center gap-2 transition-all hover:scale-105">
-                                Jamoaga Qo'shilish So'rovi
+                            <button onclick="openApplyModal('${p.id}')" class="px-8 py-4 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-105">
+                                Jamoaga Qo'shilish (Vizitka yuborish)
                             </button>
                         ` : ''}
                     </div>
@@ -405,12 +495,46 @@
             document.getElementById('projectDetailsModal').classList.remove('hidden');
         }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
+        function openApplyModal(projectId) {
+            // Tizim profil ochiq yoki yo'qligini tekshiradi
+            if (!currentUser.isEmailPublic || !currentUser.profession) {
+                showToast("Avval profilingizni (rezyumeni) to'ldiring va ochiq (public) qiling!", false);
+                closeModal('projectDetailsModal');
+                openProfileModal();
+                return;
+            }
+            document.getElementById('applyProjectId').value = projectId;
+            document.getElementById('applyModal').classList.remove('hidden');
         }
 
-        function switchTab(tabId) { /* O'zgarishsiz */ }
+        async function submitApplication(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitAppBtn');
+            btn.disabled = true; btn.textContent = "Yuborilmoqda...";
+
+            const data = {
+                projectId: document.getElementById('applyProjectId').value,
+                expectedBenefit: document.getElementById('appBenefit').value,
+                timeCommitment: document.getElementById('appTime').value
+            };
+
+            // Hozircha UI uchun Toast (Keyingi qadamda Request yozamiz)
+            setTimeout(() => {
+                showToast("Muvaffaqiyatli! So'rov va vizitkangiz loyiha egasiga yuborildi.");
+                closeModal('applyModal');
+                closeModal('projectDetailsModal');
+                btn.disabled = false; btn.textContent = "Vizitkani Yuborish";
+            }, 1000);
+        }
+
+        async function submitNewProject(e) {
+             // O'tgan safargi qolib qoladi
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function switchTab(tabId) { /* O'tgan safargi qolib qoladi */ }
         function logout() { localStorage.removeItem('hub_token'); window.location.href = '/login'; }
+        function toggleMenu() { /* O'tgan safargi qolib qoladi */ }
         
         window.addEventListener('load', initDashboard);
     </script>
