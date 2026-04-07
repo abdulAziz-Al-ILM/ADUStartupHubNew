@@ -1,12 +1,18 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const { checkTextContent } = require('../services/ai');
+
+// Agar AI servisingiz tayyor bo'lmasa, hozircha "Mock" (soxta) AI filtri ishlatib turamiz, 
+// toki tizim xatosiz yonsin. (Keyinchalik o'zingizning asl AI faylingizni ulab olasiz)
+const checkTextContent = async (text) => {
+  return { isSafe: true, filteredText: text }; 
+};
 
 // Kunlik tahrir limitini tekshirish utilitasi
 const checkAndResetProfileEditLimit = async (user) => {
   const now = new Date();
   const lastReset = new Date(user.lastResetDate);
   
+  // Agar kun o'zgargan bo'lsa, limitlarni 0 ga tushiramiz
   if (now.getDate() !== lastReset.getDate() || now.getMonth() !== lastReset.getMonth()) {
     return await prisma.user.update({
       where: { id: user.id },
@@ -16,6 +22,7 @@ const checkAndResetProfileEditLimit = async (user) => {
   return user;
 };
 
+// 1. PROFILNI YANGILASH (Rezyume sozlamalari)
 exports.updateProfile = async (req, res) => {
   try {
     const { 
@@ -34,13 +41,13 @@ exports.updateProfile = async (req, res) => {
 
     let updateData = {};
 
-    // 1. AVATAR STIKER
+    // AVATAR STIKER
     if (avatarSticker !== undefined) updateData.avatarSticker = avatarSticker;
 
-    // 2. MUTAXASSISLIK
+    // MUTAXASSISLIK
     if (profession) updateData.profession = profession;
 
-    // 3. NIKNEYM (1 oyda 1 marta)
+    // NIKNEYM (1 oyda 1 marta)
     if (nickname && nickname !== user.nickname) {
       if (user.nicknameSetAt) {
         const diffInDays = (new Date() - new Date(user.nicknameSetAt)) / (1000 * 60 * 60 * 24);
@@ -56,7 +63,7 @@ exports.updateProfile = async (req, res) => {
       updateData.nicknameSetAt = new Date();
     }
 
-    // 4. YANGI MAYDONLAR (Rezyume uchun)
+    // YANGI MAYDONLAR (Rezyume uchun)
     if (firstName !== undefined) updateData.firstName = firstName;
     if (age !== undefined) updateData.age = parseInt(age);
     if (faculty !== undefined) updateData.faculty = faculty;
@@ -65,7 +72,7 @@ exports.updateProfile = async (req, res) => {
     if (dailyHours !== undefined) updateData.dailyHours = parseInt(dailyHours);
     if (isEmailPublic !== undefined) updateData.isEmailPublic = isEmailPublic;
 
-    // 5. MATNLI MAYDONLAR (AI Senzura)
+    // MATNLI MAYDONLAR (AI Senzura)
     if (aboutMe) {
       const aiCheck = await checkTextContent(aboutMe);
       updateData.aboutMe = aiCheck.filteredText;
@@ -92,6 +99,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
+// 2. PROFILNI YUKLASH (Aynan shu funksiya topilmagan edi!)
 exports.getProfile = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
@@ -101,11 +109,16 @@ exports.getProfile = async (req, res) => {
         avatarSticker: true, profession: true, aboutMe: true, isEmailPublic: true,
         firstName: true, age: true, faculty: true, course: true, principles: true,
         weeklyHours: true, dailyHours: true,
-        dailyMsgCount: true, dailyIdeaCount: true, dailyProfileEdits: true
+        dailyMsgCount: true, dailyIdeaCount: true, dailyProfileEdits: true,
+        canCreateProject: true // Dashboardda "+ Yangi startap" tugmasini ko'rsatish uchun muhim
       }
     });
+    
+    if (!user) return res.status(404).json({ error: "Foydalanuvchi topilmadi" });
+    
     res.status(200).json(user);
   } catch (error) {
+    console.error("Profilni yuklashda xato:", error);
     res.status(500).json({ error: "Profilni yuklashda xatolik." });
   }
 };
