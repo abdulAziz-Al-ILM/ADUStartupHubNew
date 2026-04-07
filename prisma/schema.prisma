@@ -34,13 +34,15 @@ enum Profession {
   PHYSICIST
 }
 
+// YANGILANGAN STARTAP HOLATLARI
 enum ProjectStatus {
-  TEAM_BUILDING       
-  MVP_PREPARATION     
-  MARKET_PREPARATION  
-  IN_MARKET           
-  REJECTED            
-  FINISHED            
+  TEAM_BUILDING       // Jamoa yig'moqda
+  MVP_PREPARATION     // MVP tayyorlanmoqda
+  NEED_INVESTMENT     // MVP tayyor, pul/sarmoya kerak
+  READY_FOR_MARKET    // Bozorga olib chiqish kerak
+  MARKET_TESTING      // Bozorga olib chiqildi, sinovda
+  IN_MARKET           // Bozorda ishlamoqda
+  FINISHED            // Loyiha tugatildi
 }
 
 enum RequestStatus {
@@ -55,13 +57,22 @@ model User {
   id               String      @id @default(uuid())
   email            String      @unique
   
-  // Profil ma'lumotlari
+  // Asosiy profil ma'lumotlari
   nickname         String?     @unique
   nicknameSetAt    DateTime?   
   avatarSticker    Int         @default(1) 
   profession       Profession?
   aboutMe          String?     @db.Text
   isEmailPublic    Boolean     @default(false)
+
+  // YANGI: Rezyume (Profil) ma'lumotlari (Barchasi ixtiyoriy)
+  firstName        String?     // Haqiqiy ism
+  age              Int?        // Yoshi
+  faculty          String?     // Fakultet/Yo'nalish
+  course           Int?        // Kursi
+  principles       String?     @db.Text // Prinsiplari (Tartib, estetika, tezlik...)
+  weeklyHours      Int?        // Haftasiga loyihaga ajrata oladigan vaqti (soat)
+  dailyHours       Int?        // Kuniga ajrata oladigan vaqti (soat)
   
   // Autentifikatsiya va Xavfsizlik
   otpCode          String?
@@ -85,13 +96,15 @@ model User {
   canCreateProject Boolean     @default(true) 
   dailyMsgCount    Int         @default(0)    
   dailyIdeaCount   Int         @default(0)    
+  dailyProfileEdits Int        @default(0)    // YANGI: Kuniga profil tahrirlash limiti (Maks: 2)
   lastResetDate    DateTime    @default(now()) 
 
   // Aloqalar
   projects         Project[]
   resumes          Resume[]
   problems         Problem[]
-  requests         Request[]
+  requests         Request[]   @relation("Sender")
+  receivedRequests Request[]   @relation("Receiver")
   following        Follow[]    @relation("Follower")
   followers        Follow[]    @relation("Following")
   sentMessages     Message[]   @relation("Sender")
@@ -111,23 +124,28 @@ model InviteCode {
 }
 
 model Project {
-  id            String        @id @default(uuid())
-  title         String
-  goal          String        @db.Text 
-  reason        String        @db.Text 
-  benefit       String        @db.Text 
+  id              String        @id @default(uuid())
+  title           String
+  goal            String        @db.Text 
+  reason          String        @db.Text 
+  benefit         String        @db.Text // Manfaati (nonprofit/profit va jamoa uchun)
   
-  category      Profession    
-  status        ProjectStatus @default(TEAM_BUILDING)
-  cancelReason  String?       @db.Text 
+  // YANGI: Loyiha talablari va muhiti
+  telegramLink    String?       // Loyihaning yopiq Telegram guruhi havolasi
+  currentProblems String?       @db.Text // Loyihada hozir mavjud muammolar
+  deadline        String?       // Qancha muddatga reja qilingan
   
-  authorId      String
-  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category        Profession    
+  status          ProjectStatus @default(TEAM_BUILDING)
+  cancelReason    String?       @db.Text // Tugatilish sababi (AI tomonidan tozalangan)
   
-  requests      Request[]
+  authorId        String
+  author          User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  requests        Request[]
 
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model Problem {
@@ -157,24 +175,50 @@ model Resume {
   updatedAt   DateTime   @updatedAt
 }
 
+// Startapga qo'shilish yoki Mutaxassisga taklif yuborish
 model Request {
-  id          String        @id @default(uuid())
-  status      RequestStatus @default(PENDING)
+  id              String        @id @default(uuid())
+  status          RequestStatus @default(PENDING)
   
-  senderId    String
-  sender      User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  // YANGI: Ariza to'ldirilgandagi javoblar (Vizitka uchun)
+  expectedBenefit String?       @db.Text // Talaba loyihadan nima kutyapti / Loyiha talabadan
+  timeCommitment  String?       // Qancha vaqt ajrata oladi
   
-  projectId   String?
-  project     Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  senderId        String
+  sender          User          @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
   
-  resumeId    String?
-  resume      Resume?       @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  receiverId      String?       // Mutaxassisga to'g'ridan-to'g'ri taklif yuborish uchun
+  receiver        User?         @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  
+  projectId       String?
+  project         Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  resumeId        String?
+  resume          Resume?       @relation(fields: [resumeId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
-// Ijtimoiy logikalar (Kuzatish va Xabarlar)
+// YANGI: Qo'llanmalar (Startaplar va vositalar uchun)
+model Manual {
+  id          String   @id @default(uuid())
+  title       String
+  link        String   @unique
+  isSafe      Boolean  @default(true) // Antivirus API orqali tekshirilgan
+  addedBy     String   // ADMIN yoki LEADER ID'si
+  createdAt   DateTime @default(now())
+}
+
+// YANGI: ILM Mizan Yangiliklari
+model News {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   @db.Text
+  link        String?  // Biron bir havola biriktirish uchun
+  createdAt   DateTime @default(now())
+}
+
 model Follow {
   id          String   @id @default(uuid())
   followerId  String
