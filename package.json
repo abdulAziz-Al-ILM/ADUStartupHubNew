@@ -1,21 +1,23 @@
 {
   "name": "adu-startup-hub",
   "version": "1.0.0",
-  "description": "ADU Startup Hub yopiq ekotizimi",
+  "description": "ILM Mizan - Yopiq startap ekotizimi",
   "main": "index.js",
   "scripts": {
-    "start": "npx prisma db push && node index.js",
-    "postinstall": "prisma generate"
+    "start": "npx prisma db push --accept-data-loss && node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "^5.10.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.9",
-    "express": "^4.18.2",
+    "express": "^4.18.3",
     "jsonwebtoken": "^9.0.2",
-    "node-telegram-bot-api": "^0.66.0",
-    "nodemailer": "^6.9.4",
-    "prisma": "^5.22.0"
+    "nodemailer": "^6.9.11",
+    "prisma": "^5.10.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
   }
 }
