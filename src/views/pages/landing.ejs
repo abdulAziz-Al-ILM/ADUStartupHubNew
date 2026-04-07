@@ -31,9 +31,10 @@
         }
     </script>
     <style>
-        .bg-grid-pattern {
-            background-image: radial-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px);
-            background-size: 40px 40px;
+        /* YANGA: Turon (Girih) Naqshlari - Cyber uslubda */
+        .bg-turon-pattern {
+            background-color: #0b1120;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 0l15 15-15 15L15 15 30 0zm0 30l15 15-15 15-15-15 15-15zM0 30l15-15v30L0 30zm60 0l-15-15v30l15-15z' stroke='%233b82f6' stroke-width='1' stroke-opacity='0.05'/%3E%3C/g%3E%3C/svg%3E");
         }
         .glass-nav {
             background: rgba(11, 17, 32, 0.6);
@@ -64,9 +65,8 @@
         }
     </style>
 </head>
-<body class="bg-darkBg text-slate-200 font-sans antialiased selection:bg-blue-500/30 overflow-x-hidden pb-24">
+<body class="bg-turon-pattern text-slate-200 font-sans antialiased selection:bg-blue-500/30 overflow-x-hidden pb-24">
 
-    <div class="fixed inset-0 bg-grid-pattern z-0 pointer-events-none opacity-40"></div>
     <div class="fixed top-[-20%] left-[-10%] w-[60vw] h-[60vw] bg-blue-600/10 rounded-full mix-blend-screen filter blur-[120px] animate-blob z-0 pointer-events-none"></div>
 
     <nav class="fixed w-full z-50 glass-nav transition-all duration-300" id="navbar">
@@ -154,7 +154,7 @@
 
             <div class="reveal delay-300 bento-card md:col-span-2 bg-darkCard border border-darkBorder/80 rounded-[32px] p-8 md:p-10 flex items-center relative overflow-hidden group">
                 <div class="z-10">
-                    <h3 class="text-2xl font-bold text-white mb-3">Chuqur Analitika</h3>
+                    <h3 class="text-2xl font-bold text-white mb-3">Tizimli Analitika</h3>
                     <p class="text-slate-400 font-light max-w-lg">Rahbariyat va tyutorlar uchun real vaqt rejimida loyihalar holati, taraqqiyoti va rad etilish sabablarini tahlil qiluvchi mukammal Dashboard paneli.</p>
                 </div>
             </div>
@@ -184,7 +184,6 @@
     </button>
 
     <script>
-        // Scroll Animatsiyalar
         document.addEventListener("DOMContentLoaded", () => {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -197,7 +196,6 @@
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         });
 
-        // PWA ENGINE
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW xatosi', err));
