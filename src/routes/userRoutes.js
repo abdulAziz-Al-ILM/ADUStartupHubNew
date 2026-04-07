@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middlewares/authMiddleware');
-const { updateProfile, getProfile } = require('../controllers/userController');
+const userController = require('../controllers/userController');
+const { verifyToken } = require('../middlewares/authMiddleware');
 
-// Barcha amallar himoyalangan
-router.use(protect);
+// Profilni yuklash
+router.get('/me', verifyToken, userController.getProfile);
 
-router.get('/me', getProfile);          // Profilni ko'rish
-router.put('/me', updateProfile);       // Profilni yangilash (Stiker, Mutaxassislik, AI tekshiruv)
+// Profilni (Rezyumeni) tahrirlash
+router.put('/profile', verifyToken, userController.updateProfile);
 
 module.exports = router;
